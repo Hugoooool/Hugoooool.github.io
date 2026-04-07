@@ -1,0 +1,2 @@
+# Hugoooool.github.io
+blog
