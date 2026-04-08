@@ -2,20 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://hugoooool.github.io/posts/123/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/tags/about/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/posts/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/tags/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/categories/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/about/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/categories/%E6%9D%82%E8%AE%B0/</loc>
+    <lastmod>2026-04-08T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://hugoooool.github.io/posts/456/</loc>
     <lastmod>2026-04-07T21:57:26+08:00</lastmod>
   </url><url>
-    <loc>https://hugoooool.github.io/</loc>
-    <lastmod>2026-04-07T21:57:26+08:00</lastmod>
+    <loc>https://hugoooool.github.io/series/</loc>
   </url><url>
-    <loc>https://hugoooool.github.io/posts/</loc>
-    <lastmod>2026-04-07T21:57:26+08:00</lastmod>
+    <loc>https://hugoooool.github.io/archives/</loc>
   </url><url>
-    <loc>https://hugoooool.github.io/posts/123/</loc>
-    <lastmod>2026-04-07T13:42:26+08:00</lastmod>
-  </url><url>
-    <loc>https://hugoooool.github.io/categories/</loc>
-  </url><url>
-    <loc>https://hugoooool.github.io/tags/</loc>
+    <loc>https://hugoooool.github.io/search/</loc>
   </url>
 </urlset>

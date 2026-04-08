@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://hugoooool.github.io/sitemap.xml
