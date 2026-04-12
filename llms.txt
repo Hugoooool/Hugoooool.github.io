@@ -1,6 +1,7 @@
 # 云淡风轻
 - [关于](https://hugoooool.github.io/about/)
 
-## Posts
-- [123](https://hugoooool.github.io/posts/123/)
-- [456](https://hugoooool.github.io/posts/456/)
+## 文章
+- [Hugo PaperMod + Github Page博客页面搭建](https://hugoooool.github.io/papers/%E6%9D%82%E8%AE%B0/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)
+- [123](https://hugoooool.github.io/papers/123/)
+- [456](https://hugoooool.github.io/papers/456/)
