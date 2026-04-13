@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>云淡风轻</title>
-    <link>https://hugoooool.github.io/</link>
-    <description>Recent content on 云淡风轻</description>
+    <title>测试 on 云淡风轻</title>
+    <link>https://hugoooool.github.io/papers/test/</link>
+    <description>Recent content in 测试 on 云淡风轻</description>
     <generator>Hugo</generator>
     <language>zh</language>
     <copyright>PaperMod Contributors</copyright>
     <lastBuildDate>Mon, 13 Apr 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://hugoooool.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://hugoooool.github.io/papers/test/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>用于测试的博客二</title>
       <link>https://hugoooool.github.io/papers/test/%E7%94%A8%E4%BA%8E%E6%B5%8B%E8%AF%95%E7%9A%84%E5%8D%9A%E5%AE%A2%E4%BA%8C/</link>
@@ -44,20 +44,6 @@
 &lt;li&gt;时间：13:18&lt;/li&gt;
 &lt;li&gt;目的：用于提交测试&lt;/li&gt;
 &lt;/ol&gt;</description>
-    </item>
-    <item>
-      <title>Hugo PaperMod &#43; Github Page博客页面搭建</title>
-      <link>https://hugoooool.github.io/papers/others/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</link>
-      <pubDate>Thu, 09 Apr 2026 00:00:00 +0000</pubDate>
-      <guid>https://hugoooool.github.io/papers/others/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</guid>
-      <description>简单记录了搭建Hugo PaperMod &#43; Github Page博客的过程</description>
-    </item>
-    <item>
-      <title>关于</title>
-      <link>https://hugoooool.github.io/about/</link>
-      <pubDate>Wed, 08 Apr 2026 00:00:00 +0000</pubDate>
-      <guid>https://hugoooool.github.io/about/</guid>
-      <description>关于作者的介绍</description>
     </item>
   </channel>
 </rss>
