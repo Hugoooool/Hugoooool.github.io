@@ -3,9 +3,5 @@
 
 ## 文章
 
-### 测试
-- [用于测试的博客二](https://hugoooool.github.io/papers/test/%E7%94%A8%E4%BA%8E%E6%B5%8B%E8%AF%95%E7%9A%84%E5%8D%9A%E5%AE%A2%E4%BA%8C/)
-- [用于测试的博客一](https://hugoooool.github.io/papers/test/%E7%94%A8%E4%BA%8E%E6%B5%8B%E8%AF%95%E7%9A%84%E5%8D%9A%E5%AE%A2%E4%B8%80/)
-
 ### 杂记
-- [Hugo PaperMod + Github Page博客页面搭建](https://hugoooool.github.io/papers/others/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)
+- [博客搭建过程简单记录](https://hugoooool.github.io/papers/others/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)
