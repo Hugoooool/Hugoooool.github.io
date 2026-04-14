@@ -71,6 +71,18 @@
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.css">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.js"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ]
+    });">
 </script><meta property="og:url" content="https://hugoooool.github.io/papers/test/">
   <meta property="og:site_name" content="云淡风轻">
   <meta property="og:title" content="测试">
@@ -131,6 +143,11 @@
             </div>
         </div>
         <ul id="menu">
+            <li>
+                <a href="https://hugoooool.github.io/Papers" title="📄文章">
+                    <span>📄文章</span>
+                </a>
+            </li>
             <li>
                 <a href="https://hugoooool.github.io/archives" title="📁归档">
                     <span>📁归档</span>

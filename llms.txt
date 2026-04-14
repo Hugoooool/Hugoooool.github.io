@@ -3,5 +3,8 @@
 
 ## 文章
 
+### 控制算法笔记
+- [基于MATLAB的模型预测控制系统设计与实现一](https://hugoooool.github.io/papers/control-algorithm/matlab-and-mpc-1/)
+
 ### 杂记
 - [博客搭建过程简单记录](https://hugoooool.github.io/papers/others/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/)

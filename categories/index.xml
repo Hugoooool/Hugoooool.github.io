@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>zh</language>
     <copyright>PaperMod Contributors</copyright>
-    <lastBuildDate>Mon, 13 Apr 2026 14:16:12 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 13 Apr 2026 15:07:08 +0800</lastBuildDate>
     <atom:link href="https://hugoooool.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MPC</title>
+      <link>https://hugoooool.github.io/categories/mpc/</link>
+      <pubDate>Mon, 13 Apr 2026 15:07:08 +0800</pubDate>
+      <guid>https://hugoooool.github.io/categories/mpc/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Others</title>
       <link>https://hugoooool.github.io/categories/others/</link>

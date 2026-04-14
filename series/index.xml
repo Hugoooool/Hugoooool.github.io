@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>zh</language>
     <copyright>PaperMod Contributors</copyright>
-    <lastBuildDate>Mon, 13 Apr 2026 14:16:12 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 13 Apr 2026 15:07:08 +0800</lastBuildDate>
     <atom:link href="https://hugoooool.github.io/series/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Matlab MPC</title>
+      <link>https://hugoooool.github.io/series/matlab-mpc/</link>
+      <pubDate>Mon, 13 Apr 2026 15:07:08 +0800</pubDate>
+      <guid>https://hugoooool.github.io/series/matlab-mpc/</guid>
+      <description></description>
+    </item>
     <item>
       <title>博客</title>
       <link>https://hugoooool.github.io/series/%E5%8D%9A%E5%AE%A2/</link>
