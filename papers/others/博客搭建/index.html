@@ -135,8 +135,8 @@
   "keywords": [
     "Others"
   ],
-  "articleBody": "1. 安装Hugo 去这个项目地址https://github.com/gohugoio/hugo，点Tags选一个最新版点进去。\n找到一个extended的windows版本下载。\n解压之后得到一个文件夹，随便放哪里，把目录添加进环境变量。\n2. 新建网站 打开终端用指令新建hugo网站：\nhugo new site my-website 将这个文件夹初始化git\ngit init 然后安装主题\ngit submodule add https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod 打开config.yml，将主题添加进去\ntheme: [PaperMod] 如果配置文件是hugo.toml可以删掉改成config.yml 然后用这个指令可以本地预览网站：\nhugo server -D 3. Github Page设置 如果将public文件夹直接推到github上，会发现显示的网站页面跟本地预览的不一样。这是因为在windows下编译网站的原因。 站点能在本地能够正常显示，但是无法在github pages 中正常显示这个网站有在讨论这个问题的。 所以要么用Ubantu编译网站，要么用github action自动部署。 我采用的github action。需要两个仓库，一个用来显示github page，需要public仓库，另一个私有仓库保存博客源文件。具体搭建过程看这个博客 github action里面配置了运行环境，所以不会出现上述问题。 需要注意的是github action里面的deploy.yml文件里面的PUBLISH_BRANCH: master分支要与github page仓库里面设置的分支一致。\n4. 网站配置 如果需要更高级的一些网站配置可以直接clone paper mode 仓库，切换到exampleSite分支，这是一个paper mod主题的网站例子，可以参考它的配置文件config.yml。注意这个分支没有主题，需要先安装主题：\ngit submodule add https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod 再运行\nhugo server -D 就能看到示例网站了。\n5. 结合Obsidian 在content文件夹里面创建Obsidian仓库名为Papers，后面所有文章都写到Papers文件夹里面。 在.gitignore里面写入： public/ resources/ .obsidian/ 在Obsidian里面设置-\u003e编辑器-\u003e笔记属性-\u003e源码，设置成这样是因为下面这种封面的写法在Obsidian默认属性里面没法写： cover: image: \"images/papermod-cover.png\" relative: true hidden: false 在Papers文件夹里面创建文件_index.md里面写成如下，这是为了定义网站的二级目录名。 --- title: \"文章\" --- 如果博客里面没有图片，则只需新增一个md文件，命名无所谓。 如果有图片的博客，最好先建一个文件夹我这篇描述博客搭建的文章，就是在Papers文件夹里面新建了“博客搭建”文件夹，再在这个文件夹里面新建一个images文件夹用于存放图片，以及一个index.md文件，用于写博客正文。 -Papers --博客搭建 ---images ---index.md 这样的目录可以解决网站编译文件里面图片路径与Obsidian里面图片路径不一致的问题，如果博客文章里面需要使用图片，则路径与Obsidian里面的一致，显示效果也一直。 ![图片名](images/1.png) 6. 自动发布 每次博客写完，只需git commit 然后 git push就可以更新github page。在源博客仓库里面可以看到github action运行状态，如果出错会有提示。\n",
-  "wordCount" : "101",
+  "articleBody": "1. 安装Hugo 去这个项目地址https://github.com/gohugoio/hugo，点Tags选一个最新版点进去。\n找到一个extended的windows版本下载。\n解压之后得到一个文件夹，随便放哪里，把目录添加进环境变量。\n2. 新建网站 打开终端用指令新建hugo网站：\nhugo new site my-website 将这个文件夹初始化git\ngit init 然后安装主题\ngit submodule add https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod 打开config.yml，将主题添加进去\ntheme: [PaperMod] 如果配置文件是hugo.toml可以删掉改成config.yml 然后用这个指令可以本地预览网站：\nhugo server -D 3. Github Page设置 如果将public文件夹直接推到github上，会发现显示的网站页面跟本地预览的不一样。这是因为在windows下编译网站的原因。 站点能在本地能够正常显示，但是无法在github pages 中正常显示这个网站有在讨论这个问题的。 所以要么用Ubantu编译网站，要么用github action自动部署。 我采用的github action。需要两个仓库，一个用来显示github page，需要public仓库，另一个私有仓库保存博客源文件。具体搭建过程看这个博客 github action里面配置了运行环境，所以不会出现上述问题。 需要注意的是github action里面的deploy.yml文件里面的PUBLISH_BRANCH: master分支要与github page仓库里面设置的分支一致。\n4. 网站配置 如果需要更高级的一些网站配置可以直接clone paper mode 仓库，切换到exampleSite分支，这是一个paper mod主题的网站例子，可以参考它的配置文件config.yml。注意这个分支没有主题，需要先安装主题：\ngit submodule add https://github.com/adityatelange/hugo-PaperMod.git themes/PaperMod 再运行\nhugo server -D 就能看到示例网站了。\n5. 结合Obsidian 在content文件夹里面创建Obsidian仓库名为Papers，后面所有文章都写到Papers文件夹里面。 在.gitignore里面写入： public/ resources/ .obsidian/ 在Obsidian里面设置-\u003e编辑器-\u003e笔记属性-\u003e源码，设置成这样是因为下面这种封面的写法在Obsidian默认属性里面没法写： cover: image: \"images/papermod-cover.png\" relative: true hidden: false 在Papers文件夹里面创建文件_index.md里面写成如下，这是为了定义网站的二级目录名。 --- title: \"文章\" --- 如果博客里面没有图片，则只需新增一个md文件，命名无所谓。 如果有图片的博客，最好先建一个文件夹我这篇描述博客搭建的文章，就是在Papers文件夹里面新建了“博客搭建”文件夹，再在这个文件夹里面新建一个images文件夹用于存放图片，以及一个index.md文件，用于写博客正文。 -Papers --博客搭建 ---images ---index.md 这样的目录可以解决网站编译文件里面图片路径与Obsidian里面图片路径不一致的问题，如果博客文章里面需要使用图片，则路径与Obsidian里面的一致，显示效果也一直。 ![图片名](images/1.png) 公式支持 在layout/partials/里面新建一个文件extend_head.html，复制下列代码进去就可以了。有些公式显示有问题，比如//换行需要写成///。 Obsidian插件 需要用到的插件如下 6. 自动发布 每次博客写完，只需git commit 然后 git push就可以更新github page。在源博客仓库里面可以看到github action运行状态，如果出错会有提示。\n",
+  "wordCount" : "144",
   "inLanguage": "zh",
   "image":"https://hugoooool.github.io/papers/others/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/images/papermod-cover.png","datePublished": "2026-04-13T14:16:12+08:00",
   "dateModified": "2026-04-13T14:16:12+08:00",
@@ -432,7 +432,29 @@ title: &#34;文章&#34;
 <li>这样的目录可以解决网站编译文件里面图片路径与Obsidian里面图片路径不一致的问题，如果博客文章里面需要使用图片，则路径与Obsidian里面的一致，显示效果也一直。</li>
 </ul>
 <pre tabindex="0"><code>![图片名](images/1.png)
-</code></pre><h2 id="6-自动发布">6. 自动发布<a hidden class="anchor" aria-hidden="true" href="#6-自动发布">#</a></h2>
+</code></pre><ul>
+<li>公式支持
+在layout/partials/里面新建一个文件extend_head.html，复制下列代码进去就可以了。有些公式显示有问题，比如//换行需要写成///。</li>
+</ul>
+<pre tabindex="0"><code>&lt;!-- 引入KaTeX CSS --&gt;
+&lt;link rel=&#34;stylesheet&#34; href=&#34;https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.css&#34;&gt;
+&lt;!-- 引入KaTeX JS --&gt;
+&lt;script defer src=&#34;https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.js&#34;&gt;&lt;/script&gt;
+&lt;!-- 引入自动渲染插件 --&gt;
+&lt;script defer src=&#34;https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/contrib/auto-render.min.js&#34;
+    onload=&#34;renderMathInElement(document.body, {
+        delimiters: [
+            {left: &#39;$$&#39;, right: &#39;$$&#39;, display: true},
+            {left: &#39;$&#39;, right: &#39;$&#39;, display: false}
+        ]
+    });&#34;&gt;
+&lt;/script&gt;
+</code></pre><ul>
+<li>Obsidian插件
+需要用到的插件如下
+<img alt="alt" loading="lazy" src="/papers/others/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/images/ScreenShot_2026-04-15_172726_093.png"></li>
+</ul>
+<h2 id="6-自动发布">6. 自动发布<a hidden class="anchor" aria-hidden="true" href="#6-自动发布">#</a></h2>
 <p>每次博客写完，只需git commit 然后 git push就可以更新github page。在源博客仓库里面可以看到github action运行状态，如果出错会有提示。</p>
 
 
