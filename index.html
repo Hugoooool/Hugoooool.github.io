@@ -247,6 +247,35 @@
 <article class="post-entry">
     <div class="entry-content-wrapper">
         <header class="entry-header">
+            <h2 class="entry-hint-parent">机械臂手眼标定
+            </h2>
+        </header>
+        <div class="entry-content">
+            <p>机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。
+一、AX=XB 1.1 建模 首先约定各坐标系名称为：Base–机械臂基坐标系；Grip–机械臂末端坐标系；Tracker–机械臂末端示踪器坐标系；Camera–相机坐标系；
+1.1.1 根据示踪器到机械臂末端之间位置不变建模 当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程： $$ ^gT_{b}^{(i)} \ ^bT_{c} \ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \ ^bT_{c} \ ^cT_{t}^{(j)} $$ 将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得： $$ (^gT_{b}^{(j)})^{-1} \ ^gT_{b}^{(i)}\ ^bT_{c}=^bT_{c}\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1} $$ 其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij}\tag{1.1} $$ 其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。
+图1 eye-to-hand手眼标定 1.1.2 根据相机到机械臂基坐标之间位置不变建模 还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程： $$ ^bT_{g}^{(i)} \ ^gT_{t} \ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \ ^gT_{t} \ ^tT_{c}^{(j)} $$ 同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得： $$ (^bT_{g}^{(j)})^{-1} \ ^bT_{g}^{(i)}\ ^gT_{t}=^gT_{t}\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1} $$ 其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij} $$ 其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。
+1.2 求解 无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：
+...</p>
+        </div>
+        <footer class="entry-footer"><span title='2026-05-19 16:05:29 +0800 +0800'>2026年5月19日</span>&nbsp;·&nbsp;<span>5 分钟</span>&nbsp;·&nbsp;<span>巴普蒂斯塔</span></footer>
+    </div>
+    <div class="entry-cover-wrapper"> 
+<figure class="entry-cover">
+            <img loading="lazy"
+                srcset='https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1_hu_a9939daf85293be6.png 360w,https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1_hu_afc5312e49233ccc.png 480w,https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png 566w'
+                src="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png"
+                sizes="(min-width: 768px) 720px, 100vw"
+                width="566" height="479"
+                alt="">
+</figure>
+    </div>
+    <a class="entry-link" aria-label="post link to 机械臂手眼标定" href="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/"></a>
+</article>
+
+<article class="post-entry">
+    <div class="entry-content-wrapper">
+        <header class="entry-header">
             <h2 class="entry-hint-parent">基于MATLAB的MPC系统设计与实现一
             </h2>
         </header>

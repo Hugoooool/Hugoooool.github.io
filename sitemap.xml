@@ -2,6 +2,39 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://hugoooool.github.io/series/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/tags/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/categories/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/categories/%E6%9C%BA%E6%A2%B0%E8%87%82/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/series/%E6%9C%BA%E6%A2%B0%E8%87%82/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/tags/%E6%9C%BA%E6%A2%B0%E8%87%82/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/papers/robot-algorithm/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/tags/%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/papers/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hugoooool.github.io/</loc>
+    <lastmod>2026-05-19T16:05:29+08:00</lastmod>
+  </url><url>
     <loc>https://hugoooool.github.io/tags/control/</loc>
     <lastmod>2026-04-13T15:07:08+08:00</lastmod>
   </url><url>
@@ -14,25 +47,10 @@
     <loc>https://hugoooool.github.io/tags/mpc/</loc>
     <lastmod>2026-04-13T15:07:08+08:00</lastmod>
   </url><url>
-    <loc>https://hugoooool.github.io/series/</loc>
-    <lastmod>2026-04-13T15:07:08+08:00</lastmod>
-  </url><url>
-    <loc>https://hugoooool.github.io/tags/</loc>
-    <lastmod>2026-04-13T15:07:08+08:00</lastmod>
-  </url><url>
-    <loc>https://hugoooool.github.io/categories/</loc>
-    <lastmod>2026-04-13T15:07:08+08:00</lastmod>
-  </url><url>
     <loc>https://hugoooool.github.io/papers/control-algorithm/matlab-and-mpc-1/</loc>
     <lastmod>2026-04-13T15:07:08+08:00</lastmod>
   </url><url>
     <loc>https://hugoooool.github.io/papers/control-algorithm/</loc>
-    <lastmod>2026-04-13T15:07:08+08:00</lastmod>
-  </url><url>
-    <loc>https://hugoooool.github.io/papers/</loc>
-    <lastmod>2026-04-13T15:07:08+08:00</lastmod>
-  </url><url>
-    <loc>https://hugoooool.github.io/</loc>
     <lastmod>2026-04-13T15:07:08+08:00</lastmod>
   </url><url>
     <loc>https://hugoooool.github.io/categories/others/</loc>

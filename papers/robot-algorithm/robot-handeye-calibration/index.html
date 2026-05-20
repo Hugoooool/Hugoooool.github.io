@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>机械臂手眼标定 | 云淡风轻</title>
+<meta name="keywords" content="机械臂, 手眼标定">
+<meta name="description" content="机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。
+一、AX=XB
+1.1 建模
+首先约定各坐标系名称为：Base&ndash;机械臂基坐标系；Grip&ndash;机械臂末端坐标系；Tracker&ndash;机械臂末端示踪器坐标系；Camera&ndash;相机坐标系；
+1.1.1 根据示踪器到机械臂末端之间位置不变建模
+当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程：
+$$
+^gT_{b}^{(i)} \ ^bT_{c} \ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \ ^bT_{c} \ ^cT_{t}^{(j)}
+$$
+将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得：
+$$
+(^gT_{b}^{(j)})^{-1} \ ^gT_{b}^{(i)}\ ^bT_{c}=^bT_{c}\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}
+$$
+其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成：
+$$
+A_{ij}X=XB_{ij}\tag{1.1}
+$$
+其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。
+图1 eye-to-hand手眼标定
+
+1.1.2 根据相机到机械臂基坐标之间位置不变建模
+还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程：
+$$
+^bT_{g}^{(i)} \ ^gT_{t} \ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \ ^gT_{t} \ ^tT_{c}^{(j)}
+$$
+同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得：
+$$
+(^bT_{g}^{(j)})^{-1} \ ^bT_{g}^{(i)}\ ^gT_{t}=^gT_{t}\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}
+$$
+其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成：
+$$
+A_{ij}X=XB_{ij}
+$$
+其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。
+1.2 求解
+无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：">
+<meta name="author" content="巴普蒂斯塔">
+<link rel="canonical" href="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.acd1e4a8bff2d847ae6f63fa5ab251227e0cbd53b9943b684293f403b3057fd5.css" integrity="sha256-rNHkqL/y2Eeub2P6WrJRIn4MvVO5lDtoQpP0A7MFf9U=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://hugoooool.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hugoooool.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hugoooool.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://hugoooool.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://hugoooool.github.io/favicon.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.css">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/katex.min.js"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.45/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ]
+    });">
+</script><meta property="og:url" content="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/">
+  <meta property="og:site_name" content="云淡风轻">
+  <meta property="og:title" content="机械臂手眼标定">
+  <meta property="og:description" content="机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。
+一、AX=XB 1.1 建模 首先约定各坐标系名称为：Base–机械臂基坐标系；Grip–机械臂末端坐标系；Tracker–机械臂末端示踪器坐标系；Camera–相机坐标系；
+1.1.1 根据示踪器到机械臂末端之间位置不变建模 当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程： $$ ^gT_{b}^{(i)} \ ^bT_{c} \ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \ ^bT_{c} \ ^cT_{t}^{(j)} $$ 将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得： $$ (^gT_{b}^{(j)})^{-1} \ ^gT_{b}^{(i)}\ ^bT_{c}=^bT_{c}\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1} $$ 其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij}\tag{1.1} $$ 其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。
+图1 eye-to-hand手眼标定 1.1.2 根据相机到机械臂基坐标之间位置不变建模 还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程： $$ ^bT_{g}^{(i)} \ ^gT_{t} \ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \ ^gT_{t} \ ^tT_{c}^{(j)} $$ 同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得： $$ (^bT_{g}^{(j)})^{-1} \ ^bT_{g}^{(i)}\ ^gT_{t}=^gT_{t}\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1} $$ 其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij} $$ 其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。
+1.2 求解 无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="papers">
+    <meta property="article:published_time" content="2026-05-19T16:05:29+08:00">
+    <meta property="article:modified_time" content="2026-05-19T16:05:29+08:00">
+    <meta property="article:tag" content="机械臂">
+    <meta property="article:tag" content="手眼标定">
+    <meta property="og:image" content="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png">
+  <meta name="twitter:title" content="机械臂手眼标定">
+  <meta name="twitter:description" content="机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。
+一、AX=XB 1.1 建模 首先约定各坐标系名称为：Base–机械臂基坐标系；Grip–机械臂末端坐标系；Tracker–机械臂末端示踪器坐标系；Camera–相机坐标系；
+1.1.1 根据示踪器到机械臂末端之间位置不变建模 当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程： $$ ^gT_{b}^{(i)} \ ^bT_{c} \ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \ ^bT_{c} \ ^cT_{t}^{(j)} $$ 将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得： $$ (^gT_{b}^{(j)})^{-1} \ ^gT_{b}^{(i)}\ ^bT_{c}=^bT_{c}\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1} $$ 其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij}\tag{1.1} $$ 其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。
+图1 eye-to-hand手眼标定 1.1.2 根据相机到机械臂基坐标之间位置不变建模 还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程： $$ ^bT_{g}^{(i)} \ ^gT_{t} \ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \ ^gT_{t} \ ^tT_{c}^{(j)} $$ 同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得： $$ (^bT_{g}^{(j)})^{-1} \ ^bT_{g}^{(i)}\ ^gT_{t}=^gT_{t}\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1} $$ 其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij} $$ 其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。
+1.2 求解 无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "文章",
+      "item": "https://hugoooool.github.io/papers/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "机械臂算法笔记",
+      "item": "https://hugoooool.github.io/papers/robot-algorithm/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "机械臂手眼标定",
+      "item": "https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "机械臂手眼标定",
+  "name": "机械臂手眼标定",
+  "description": "机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。\n一、AX=XB 1.1 建模 首先约定各坐标系名称为：Base\u0026ndash;机械臂基坐标系；Grip\u0026ndash;机械臂末端坐标系；Tracker\u0026ndash;机械臂末端示踪器坐标系；Camera\u0026ndash;相机坐标系；\n1.1.1 根据示踪器到机械臂末端之间位置不变建模 当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程： $$ ^gT_{b}^{(i)} \\ ^bT_{c} \\ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \\ ^bT_{c} \\ ^cT_{t}^{(j)} $$ 将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得： $$ (^gT_{b}^{(j)})^{-1} \\ ^gT_{b}^{(i)}\\ ^bT_{c}=^bT_{c}\\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1} $$ 其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij}\\tag{1.1} $$ 其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。\n图1 eye-to-hand手眼标定 1.1.2 根据相机到机械臂基坐标之间位置不变建模 还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程： $$ ^bT_{g}^{(i)} \\ ^gT_{t} \\ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \\ ^gT_{t} \\ ^tT_{c}^{(j)} $$ 同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得： $$ (^bT_{g}^{(j)})^{-1} \\ ^bT_{g}^{(i)}\\ ^gT_{t}=^gT_{t}\\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1} $$ 其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij} $$ 其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。\n1.2 求解 无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：\n",
+  "keywords": [
+    "机械臂", "手眼标定"
+  ],
+  "articleBody": "机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。\n一、AX=XB 1.1 建模 首先约定各坐标系名称为：Base–机械臂基坐标系；Grip–机械臂末端坐标系；Tracker–机械臂末端示踪器坐标系；Camera–相机坐标系；\n1.1.1 根据示踪器到机械臂末端之间位置不变建模 当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程： $$ ^gT_{b}^{(i)} \\ ^bT_{c} \\ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \\ ^bT_{c} \\ ^cT_{t}^{(j)} $$ 将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得： $$ (^gT_{b}^{(j)})^{-1} \\ ^gT_{b}^{(i)}\\ ^bT_{c}=^bT_{c}\\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1} $$ 其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij}\\tag{1.1} $$ 其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。\n图1 eye-to-hand手眼标定 1.1.2 根据相机到机械臂基坐标之间位置不变建模 还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程： $$ ^bT_{g}^{(i)} \\ ^gT_{t} \\ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \\ ^gT_{t} \\ ^tT_{c}^{(j)} $$ 同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得： $$ (^bT_{g}^{(j)})^{-1} \\ ^bT_{g}^{(i)}\\ ^gT_{t}=^gT_{t}\\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1} $$ 其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成： $$ A_{ij}X=XB_{ij} $$ 其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。\n1.2 求解 无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：\nhttps://github.com/zhixy/SolveAXXB 这个库里面有三种方法分别是：SVD法、Andreff扩展法、扩展带$\\lambda$的SVD方法，后两种适用于相机未知尺度因子的情况这里不讲。 OpenCV的calibrateHandEye()函数就是用来求AX=XB的，用的是Tsai-Lenz方法。 1.2.1 SVD法 给定矩阵$A\\in R^{n\\times n},B\\in R^{n\\times n}$求未知矩阵$X\\in R^{n\\times n}$满足： $$ AX=XB $$ 改写成： $$ AX-XB=0 $$ 根据Kronecker 积​ 和 向量化算子​ vec（将矩阵按列堆叠成向量），有性质： $$ vec(AXB)=(B^{T}\\otimes A)vec(X) $$ 可以得到： $$ \\begin{aligned} vec(AX)\u0026=(I\\otimes A)vec(X) \\\\ vec(XB)\u0026=(B^{T}\\otimes I)vec(X) \\end{aligned} $$ 则原方程可以写为： $$ (I\\otimes A-B^{T}\\otimes I)vec(X)=0 $$ 令$M=(I\\otimes A-B^{T}\\otimes I)\\in R^{n^2\\times n^2}$，则问题转化成求齐次线性方程组的解： $$ M\\cdot vec(X)=0 $$ 对矩阵M进行奇异值分解： $$ M=U\\Sigma V^T $$ 其中 U,V为正交矩阵，$\\Sigma$为对角矩阵，对角线元素为奇异值 $\\sigma_{1}\\geq\\sigma_{2}\\dots\\geq\\sigma_{n^2}\\geq 0$。方程的解位于 M的零空间中，即对应奇异值为零的右奇异向量。\n若 M满秩（无零奇异值），则只有零解 X=0（通常无意义）。 实际应用中，A,B常来自含噪声的测量，严格零空间可能不存在。此时可求最小二乘解，即寻找 vec(X)使得$\\parallel M\\cdot vec(X)\\parallel^2$ ​最小，这通常对应于最小奇异值对应的右奇异向量。找出最小的奇异值$\\sigma_{min}$​，取其对应的右奇异向量$V_{min}$（即 V的最后一列，若按降序排列则需注意顺序）。将$V_{min}$​重塑为$n\\times n$矩阵，即得 X。 在手眼标定中，通常有多组数据，假设有k对$(A_{i},B_{i})$满足$A_{i}X=XB_{i}$，此时可构造增广矩阵： $$ \\bar{M}=\\begin{bmatrix} I\\otimes A_{1}-B_{1}^T\\otimes I \\\\ \\vdots \\\\ I\\otimes A_{k}-B_{k}^T\\otimes I \\end{bmatrix} $$ 其大小为$kn^2\\times n^2$。同样对$\\bar M$进行SVD分解，取最小奇异值对应的右奇异向量作为X的解。这等价于求解最小二乘问题： $$ \\operatorname*{min}\\limits_X \\displaystyle\\sum_{i=0}^k\\parallel A_{i}X-XB_{i}\\parallel_{F}^2 $$ 其中下标F表示Frobenius 范数，就是矩阵所有元素的平方和开根号。对于一个$m\\times n$的矩阵M，它的 Frobenius 范数定义为矩阵中每一个元素绝对值的平方和，再开平方根。 $$ \\parallel M\\parallel_{F}=\\sqrt{\\displaystyle\\sum_{i=0}^m \\displaystyle\\sum_{j=0}^n|m_{ij}|^2} $$ 如果你把矩阵M的所有元素按列（或按行）堆叠起来，变成一个长长的列向量vec(M)，那么$\\parallel M\\parallel_{F}$​恰好等于这个长向量的标准欧几里得范数（即 L2范数）。这就是为什么它是最自然的“长度”概念。 在最小二乘问题中： $$ \\operatorname*{min}\\limits_X\\parallel AX-XB\\parallel_{F} $$ 这里的AX−XB的结果是矩阵。加上下标 F后，整个式子的含义就非常明确了：寻找一个最优的 X，使得结果矩阵AX−XB中的每一个元素都尽可能地接近0。 优点：SVD 能在最小二乘意义下给出最优解——即寻找一个X使得误差$\\parallel AX-XB \\parallel_{F}$ ​达到最小。更重要的是，它通过舍弃极小的奇异值，天然带有滤波降噪的效果。SVD 通过考察奇异值$\\sigma_{i}$的分布，可以设定一个极小的阈值（如$10^{-6}$），小于该值的视为 0，从而准确得出矩阵的真实秩。这对判断 AX=XB是否有非零解至关重要。 缺点：容易陷入“纯数学解”，忽略物理意义。求解空间旋转矩阵时，SVD 吐出来的可能是一个包含“反射”（镜像翻转）或者拉伸变形的矩阵，而在现实中，机器人的关节只能做刚性旋转和平移。这就需要我们在 SVD 求出结果后，额外增加一步“物理约束修正”（比如强制正交化、单位化）。对异常值极度敏感，如果某几组数据严重偏离正常值，SVD 会为了让这几组数据看起来“不那么离谱”而大幅度扭曲整体模型。 1.2.2 Tsai-Lenz法 公式1.1可以改写成： $$ \\begin{bmatrix} R_{A_{ij}} \u0026 T_{A_{ij}} \\\\ 0 \u0026 1 \\end{bmatrix} \\begin{bmatrix} R_{X} \u0026 T_{X} \\\\ 0 \u0026 1 \\end{bmatrix} =\\begin{bmatrix} R_{X} \u0026 T_{X} \\\\ 0 \u0026 1 \\end{bmatrix} \\begin{bmatrix} R_{B_{ij}} \u0026 T_{B_{ij}} \\\\ 0 \u0026 1 \\end{bmatrix} $$ 整理可得： $$ \\begin{cases} R_{A_{ij}}R_{X}=R_{X}R_{B_{ij}} \\\\ R_{A_{ij}}T_{X}+T_{A_{ij}}=R_{X}R_{B_{ij}}+T_{X} \\end{cases}\\tag{1.2} $$ 其中，$R_{A_{ij}},R_{B_{ij}},T_{A_{ij}},T_{B_{}}$均可通过机器人运动学以及摄像头读数得到，需要求的是$R_{X},T_{X}$。 旋转矩阵R可以用单位旋转轴向量P和旋转角度$\\theta$来定义。假设$P_{A_{ij}}$表示旋转矩阵$R_{A_{ij}}$的单位旋转轴，$\\theta_{A_{ij}}$表示旋转角度。$P_{B_{ij}}$表示旋转矩阵$R_{B_{ij}}$的单位旋转轴，$\\theta_{B_{ij}}$表示旋转角度。$P_{X}$表示旋转矩阵$R_{X}$的单位旋转轴，$\\theta_{X}$表示旋转角度。构造一个向量： $$ P_{X}^{’}=\\frac{1}{2\\cos\\left( \\frac{\\theta_{X}}{2} \\right)}P_{X}=\\frac{1}{\\sqrt{4-|P_{X}|^2 }}P_{X} $$ 则可以得到如下方程： $$ Skew(P_{A_{ij}}+P_{B_{ij}})P_{X}^{’}=P_{B_{ij}}-P_{A_{ij}}\\tag{1.3} $$ 其中，Skew()函数表示三维向量的叉积矩阵，例如向量$V(v_{x},v_{y},v_{z})$的Skew运算为： $$ Skew(V)=\\begin{bmatrix} 0 \u0026 -v_{z} \u0026 v_{y} \\ v_{z} \u0026 0 \u0026 -v_{x} \\ -v_{y} \u0026 v_{x} \u0026 0 \\end{bmatrix} $$ 因为$Skew(P_{A_{ij}}+P_{B_{ij}})$的秩为2，所以至少需要三组机器人末端位姿进行标定才有解。 假设有k组$(A_{ij},B_{ij})$数据，将数据堆叠起来，形成一个标准的超定线性方程组$Mx=b$，其中$M\\in R^{3k\\times3},x\\in R^{3\\times1},b\\in R^{3k\\times1}$。然后使用最小二乘法（如 SVD ）求出最优的$P_{X}^{’}$。则 $$ P_{X}=\\frac{{2P_{X}^{’}}}{\\sqrt{ 1+|P_{X}^{’}|^2 }} $$ 再通过罗德里格斯公式求出旋转矩阵$R_{X}$： $$ R_{X}=\\left( 1-\\frac{{|P_{X}|^2}}{2} \\right)I+\\frac{1}{2}(P_{X}P_{X}^T+\\sqrt{ 4-|P_{X}|^2 }Skew(P_{X})) $$ 将式1.2中平移方程移项得到： $$ (R_{A_{ij}}-I)T_{X}=R_{X}T_{B_{ij}}-T_{A_{ij}} $$ 同样将k组$(A_{ij},B_{ij})$数据堆叠起来形成另一个标准超定线性方程组$Mx=b$，同样用最小二乘法（如SVD）求解出最优平移量$T_{X}$。 最终得到手眼标定结果矩阵： $$ X=\\begin{bmatrix} R_{X} \u0026 T_{X} \\ 0 \u0026 1 \\end{bmatrix} $$\n优点：计算速度极快，有封闭解（解析解），无需复杂的迭代优化，在数据无噪声的情况下能得到极高的精度。 缺点：由于是“两步法”，第一步求出的旋转矩阵​如果存在微小误差，这个误差会直接传递到第二步的平移计算中，导致最终结果产生偏差。因此，它对机器人的运动精度和标定板的检测精度要求较高。 1.2.3 迭代优化法 将式1.1写成如下形式： $$ A_{i}X=XB_{i} $$ 移项可得误差项： $$ E_{i}=(A_{i}X)^{-1}XB_{i}=X^{-1}A_{i}^{-1}XB_{i} $$ 理想情况下$E_{i}=I$。优化目标就是让$E_{i}=I$，$\\log(I)=0$，所以代价函数可以设计为： $$ J=\\displaystyle\\sum_{i=0}^{k}\\parallel \\log(E_{i})\\parallel^2 $$ 优化的变量是X_se3是6维向量，其自带流形约束（正交约束）所以不会出现SVD里面那样旋转矩阵不满足物理约束的情况。因为se3是表示的是变换矩阵的增量，所以迭代的初始值必须为单位矩阵。迭代的步骤为：\n对X_se3进行指数运算得到位姿变换$X=\\exp(X_se3)$。 计算代价函数J。 如果得到最小代价函数，则X为优化结果。否则迭代X_se3继续上述步骤。 上述理论并不复杂，实际实现的话可以使用Sophus+Ceres库，首先定义残差的计算方式：\n/*******************求解AX=XB*********************/ // ========================================================== // 残差块：log(X⁻¹ * A⁻¹ * X * B) // 优化变量：X(6维) // ========================================================== struct AXXBResidual { AXXBResidual(const Sophus::SE3d\u0026 A, const Sophus::SE3d\u0026 B) : A_(A), B_(B) { } template bool operator()(const T* const x_se3, T* residual) const { Sophus::SE3 X = Sophus::SE3::exp(Eigen::Map",
+  "wordCount" : "1065",
+  "inLanguage": "zh",
+  "image":"https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png","datePublished": "2026-05-19T16:05:29+08:00",
+  "dateModified": "2026-05-19T16:05:29+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "巴普蒂斯塔"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "云淡风轻",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://hugoooool.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://hugoooool.github.io/" accesskey="h" title="云淡风轻 (Alt + H)">云淡风轻</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://hugoooool.github.io/papers/" title="📄文章">
+                    <span>📄文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hugoooool.github.io/archives" title="📁归档">
+                    <span>📁归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hugoooool.github.io/categories/" title="🗂️分类">
+                    <span>🗂️分类</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hugoooool.github.io/tags/" title="🏷️标签">
+                    <span>🏷️标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hugoooool.github.io/search/" title="🔍搜索">
+                    <span>🔍搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hugoooool.github.io/about/" title="🏃‍➡️关于">
+                    <span>🏃‍➡️关于</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://hugoooool.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://hugoooool.github.io/papers/">文章</a>&nbsp;»&nbsp;<a href="https://hugoooool.github.io/papers/robot-algorithm/">机械臂算法笔记</a></div>
+    <h1 class="post-title entry-hint-parent">
+      机械臂手眼标定
+    </h1>
+    <div class="post-meta"><span title='2026-05-19 16:05:29 +0800 +0800'>2026年5月19日</span>&nbsp;·&nbsp;<span>5 分钟</span>&nbsp;·&nbsp;<span>巴普蒂斯塔</span>
+
+</div>
+  </header> 
+<figure class="entry-cover">
+            <img loading="eager"
+                srcset='https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1_hu_a9939daf85293be6.png 360w,https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1_hu_afc5312e49233ccc.png 480w,https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png 566w'
+                src="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png"
+                sizes="(min-width: 768px) 720px, 100vw"
+                width="566" height="479"
+                alt="">
+        
+</figure><aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#%e4%b8%80axxb" aria-label="一、AX=XB">一、AX=XB</a><ul>
+                            
+                    <li>
+                        <a href="#11-%e5%bb%ba%e6%a8%a1" aria-label="1.1 建模">1.1 建模</a><ul>
+                            
+                    <li>
+                        <a href="#111-%e6%a0%b9%e6%8d%ae%e7%a4%ba%e8%b8%aa%e5%99%a8%e5%88%b0%e6%9c%ba%e6%a2%b0%e8%87%82%e6%9c%ab%e7%ab%af%e4%b9%8b%e9%97%b4%e4%bd%8d%e7%bd%ae%e4%b8%8d%e5%8f%98%e5%bb%ba%e6%a8%a1" aria-label="1.1.1 根据示踪器到机械臂末端之间位置不变建模">1.1.1 根据示踪器到机械臂末端之间位置不变建模</a></li>
+                    <li>
+                        <a href="#112-%e6%a0%b9%e6%8d%ae%e7%9b%b8%e6%9c%ba%e5%88%b0%e6%9c%ba%e6%a2%b0%e8%87%82%e5%9f%ba%e5%9d%90%e6%a0%87%e4%b9%8b%e9%97%b4%e4%bd%8d%e7%bd%ae%e4%b8%8d%e5%8f%98%e5%bb%ba%e6%a8%a1" aria-label="1.1.2 根据相机到机械臂基坐标之间位置不变建模">1.1.2 根据相机到机械臂基坐标之间位置不变建模</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#12-%e6%b1%82%e8%a7%a3" aria-label="1.2 求解">1.2 求解</a><ul>
+                            
+                    <li>
+                        <a href="#121-svd%e6%b3%95" aria-label="1.2.1 SVD法">1.2.1 SVD法</a></li>
+                    <li>
+                        <a href="#122-tsai-lenz%e6%b3%95" aria-label="1.2.2 Tsai-Lenz法">1.2.2 Tsai-Lenz法</a></li>
+                    <li>
+                        <a href="#123-%e8%bf%ad%e4%bb%a3%e4%bc%98%e5%8c%96%e6%b3%95" aria-label="1.2.3 迭代优化法">1.2.3 迭代优化法</a></li></ul>
+                    </li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e4%ba%8caxyb" aria-label="二、AX=YB">二、AX=YB</a><ul>
+                            
+                    <li>
+                        <a href="#21-%e5%bb%ba%e6%a8%a1" aria-label="2.1 建模">2.1 建模</a></li>
+                    <li>
+                        <a href="#22-%e6%b1%82%e8%a7%a3" aria-label="2.2 求解">2.2 求解</a><ul>
+                            
+                    <li>
+                        <a href="#221-%e8%bf%ad%e4%bb%a3%e4%bc%98%e5%8c%96%e6%b3%95" aria-label="2.2.1 迭代优化法">2.2.1 迭代优化法</a>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    
+    document.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+    
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        if (elements.length > 0) {
+            
+            activeElement = elements[0];
+            const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+            document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+        }
+    
+        
+        const topLink = document.getElementById('top-link');
+        if (topLink) {
+            topLink.addEventListener('click', (event) => {
+                
+                event.preventDefault();
+    
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    }, false);
+    
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+    
+    window.addEventListener('scroll', () => {
+        
+        const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+        
+        if (scrollPosition === 0) {
+            return;
+        }
+    
+        
+        if (elements && elements.length > 0) {
+            
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - scrollPosition) > 0 && 
+                    (getOffsetTop(element) - scrollPosition) < window.innerHeight / 2) {
+                    return element;
+                }
+            }) || activeElement;
+    
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                const tocLink = document.querySelector(`.inner ul li a[href="#${id}"]`);
+                if (element === activeElement){
+                    tocLink.classList.add('active');
+    
+                    
+                    const tocContainer = document.querySelector('.toc .inner');
+                    const linkOffsetTop = tocLink.offsetTop;
+                    const containerHeight = tocContainer.clientHeight;
+                    const linkHeight = tocLink.clientHeight;
+    
+                    
+                    const scrollPosition = linkOffsetTop - (containerHeight / 2) + (linkHeight / 2);
+                    tocContainer.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+                } else {
+                    tocLink.classList.remove('active');
+                }
+            });
+        }
+    }, false);
+    
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+    
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+    
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+    
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+    
+</script>
+
+  <div class="post-content"><p>机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。</p>
+<h1 id="一axxb">一、AX=XB<a hidden class="anchor" aria-hidden="true" href="#一axxb">#</a></h1>
+<h2 id="11-建模">1.1 建模<a hidden class="anchor" aria-hidden="true" href="#11-建模">#</a></h2>
+<p>首先约定各坐标系名称为：Base&ndash;机械臂基坐标系；Grip&ndash;机械臂末端坐标系；Tracker&ndash;机械臂末端示踪器坐标系；Camera&ndash;相机坐标系；</p>
+<h3 id="111-根据示踪器到机械臂末端之间位置不变建模">1.1.1 根据示踪器到机械臂末端之间位置不变建模<a hidden class="anchor" aria-hidden="true" href="#111-根据示踪器到机械臂末端之间位置不变建模">#</a></h3>
+<p>当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程：
+$$
+^gT_{b}^{(i)} \ ^bT_{c} \ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \ ^bT_{c} \ ^cT_{t}^{(j)}
+$$
+将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得：
+$$
+(^gT_{b}^{(j)})^{-1} \ ^gT_{b}^{(i)}\ ^bT_{c}=^bT_{c}\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}
+$$
+其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成：
+$$
+A_{ij}X=XB_{ij}\tag{1.1}
+$$
+其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。</p>
+<p>图1 eye-to-hand手眼标定
+<img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-handeye-calibration/images/1.png"></p>
+<h3 id="112-根据相机到机械臂基坐标之间位置不变建模">1.1.2 根据相机到机械臂基坐标之间位置不变建模<a hidden class="anchor" aria-hidden="true" href="#112-根据相机到机械臂基坐标之间位置不变建模">#</a></h3>
+<p>还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程：
+$$
+^bT_{g}^{(i)} \ ^gT_{t} \ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \ ^gT_{t} \ ^tT_{c}^{(j)}
+$$
+同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得：
+$$
+(^bT_{g}^{(j)})^{-1} \ ^bT_{g}^{(i)}\ ^gT_{t}=^gT_{t}\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}
+$$
+其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成：
+$$
+A_{ij}X=XB_{ij}
+$$
+其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。</p>
+<h2 id="12-求解">1.2 求解<a hidden class="anchor" aria-hidden="true" href="#12-求解">#</a></h2>
+<p>无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：</p>
+<ul>
+<li><a href="https://github.com/zhixy/SolveAXXB">https://github.com/zhixy/SolveAXXB</a> 这个库里面有三种方法分别是：SVD法、Andreff扩展法、扩展带$\lambda$的SVD方法，后两种适用于相机未知尺度因子的情况这里不讲。</li>
+<li>OpenCV的calibrateHandEye()函数就是用来求AX=XB的，用的是Tsai-Lenz方法。</li>
+</ul>
+<h3 id="121-svd法">1.2.1 SVD法<a hidden class="anchor" aria-hidden="true" href="#121-svd法">#</a></h3>
+<p>给定矩阵$A\in R^{n\times n},B\in R^{n\times n}$求未知矩阵$X\in R^{n\times n}$满足：
+$$
+AX=XB
+$$
+改写成：
+$$
+AX-XB=0
+$$
+根据<strong>Kronecker 积</strong>​ 和 <strong>向量化算子</strong>​ vec（将矩阵按列堆叠成向量），有性质：
+$$
+vec(AXB)=(B^{T}\otimes A)vec(X)
+$$
+可以得到：
+$$
+\begin{aligned}
+vec(AX)&amp;=(I\otimes A)vec(X) \\
+vec(XB)&amp;=(B^{T}\otimes I)vec(X)
+\end{aligned}
+$$
+则原方程可以写为：
+$$
+(I\otimes A-B^{T}\otimes I)vec(X)=0
+$$
+令$M=(I\otimes A-B^{T}\otimes I)\in R^{n^2\times n^2}$，则问题转化成求齐次线性方程组的解：
+$$
+M\cdot vec(X)=0
+$$
+对矩阵M进行奇异值分解：
+$$
+M=U\Sigma V^T
+$$
+其中 U,V为正交矩阵，$\Sigma$为对角矩阵，对角线元素为奇异值 $\sigma_{1}\geq\sigma_{2}\dots\geq\sigma_{n^2}\geq 0$。方程的解位于 M的<strong>零空间</strong>中，即对应奇异值为零的右奇异向量。</p>
+<ul>
+<li>若 M满秩（无零奇异值），则只有零解 X=0（通常无意义）。</li>
+<li>实际应用中，A,B常来自含噪声的测量，严格零空间可能不存在。此时可求<strong>最小二乘解</strong>，即寻找 vec(X)使得$\parallel M\cdot vec(X)\parallel^2$ ​最小，这通常对应于最小奇异值对应的右奇异向量。找出最小的奇异值$\sigma_{min}$​，取其对应的右奇异向量$V_{min}$（即 V的最后一列，若按降序排列则需注意顺序）。将$V_{min}$​重塑为$n\times n$矩阵，即得 X。
+在手眼标定中，通常有多组数据，假设有k对$(A_{i},B_{i})$满足$A_{i}X=XB_{i}$，此时可构造增广矩阵：
+$$
+\bar{M}=\begin{bmatrix}
+I\otimes A_{1}-B_{1}^T\otimes I \\
+\vdots \\
+I\otimes A_{k}-B_{k}^T\otimes I
+\end{bmatrix}
+$$
+其大小为$kn^2\times n^2$。同样对$\bar M$进行SVD分解，取最小奇异值对应的右奇异向量作为X的解。这等价于求解最小二乘问题：
+$$
+\operatorname*{min}\limits_X \displaystyle\sum_{i=0}^k\parallel A_{i}X-XB_{i}\parallel_{F}^2
+$$
+其中下标F表示Frobenius 范数，就是矩阵所有元素的平方和开根号。对于一个$m\times n$的矩阵M，它的 Frobenius 范数定义为矩阵中<strong>每一个元素绝对值的平方和，再开平方根</strong>。
+$$
+\parallel M\parallel_{F}=\sqrt{\displaystyle\sum_{i=0}^m \displaystyle\sum_{j=0}^n|m_{ij}|^2}
+$$
+如果你把矩阵M的所有元素按列（或按行）堆叠起来，变成一个长长的列向量vec(M)，那么$\parallel M\parallel_{F}$​恰好等于这个长向量的标准欧几里得范数（即 L2范数）。这就是为什么它是最自然的“长度”概念。
+在最小二乘问题中：
+$$
+\operatorname*{min}\limits_X\parallel AX-XB\parallel_{F}
+$$
+这里的AX−XB的结果是矩阵。加上下标 F后，整个式子的含义就非常明确了：<strong>寻找一个最优的 X，使得结果矩阵AX−XB中的每一个元素都尽可能地接近0</strong>。</li>
+<li><strong>优点</strong>：SVD 能在<strong>最小二乘意义下</strong>给出最优解——即寻找一个X使得误差$\parallel AX-XB \parallel_{F}$ ​达到最小。更重要的是，它通过舍弃极小的奇异值，天然带有<strong>滤波降噪</strong>的效果。SVD 通过考察奇异值$\sigma_{i}$的分布，可以设定一个极小的阈值（如$10^{-6}$），小于该值的视为 0，从而准确得出矩阵的真实秩。这对判断 AX=XB是否有非零解至关重要。</li>
+<li><strong>缺点</strong>：容易陷入“纯数学解”，忽略物理意义。求解空间旋转矩阵时，SVD 吐出来的可能是一个包含“反射”（镜像翻转）或者拉伸变形的矩阵，而在现实中，机器人的关节只能做刚性旋转和平移。这就需要我们在 SVD 求出结果后，额外增加一步“物理约束修正”（比如强制正交化、单位化）。对异常值极度敏感，如果某几组数据严重偏离正常值，SVD 会为了让这几组数据看起来“不那么离谱”而大幅度扭曲整体模型。</li>
+</ul>
+<h3 id="122-tsai-lenz法">1.2.2 Tsai-Lenz法<a hidden class="anchor" aria-hidden="true" href="#122-tsai-lenz法">#</a></h3>
+<p>公式1.1可以改写成：
+$$
+\begin{bmatrix}
+R_{A_{ij}} &amp; T_{A_{ij}} \\
+0 &amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+R_{X} &amp; T_{X} \\
+0 &amp; 1
+\end{bmatrix}
+=\begin{bmatrix}
+R_{X} &amp; T_{X} \\
+0 &amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+R_{B_{ij}} &amp; T_{B_{ij}} \\
+0 &amp; 1
+\end{bmatrix}
+$$
+整理可得：
+$$
+\begin{cases}
+   R_{A_{ij}}R_{X}=R_{X}R_{B_{ij}} \\
+   R_{A_{ij}}T_{X}+T_{A_{ij}}=R_{X}R_{B_{ij}}+T_{X}
+\end{cases}\tag{1.2}
+$$
+其中，$R_{A_{ij}},R_{B_{ij}},T_{A_{ij}},T_{B_{}}$均可通过机器人运动学以及摄像头读数得到，需要求的是$R_{X},T_{X}$。
+旋转矩阵R可以用单位旋转轴向量P和旋转角度$\theta$来定义。假设$P_{A_{ij}}$表示旋转矩阵$R_{A_{ij}}$的单位旋转轴，$\theta_{A_{ij}}$表示旋转角度。$P_{B_{ij}}$表示旋转矩阵$R_{B_{ij}}$的单位旋转轴，$\theta_{B_{ij}}$表示旋转角度。$P_{X}$表示旋转矩阵$R_{X}$的单位旋转轴，$\theta_{X}$表示旋转角度。构造一个向量：
+$$
+P_{X}^{&rsquo;}=\frac{1}{2\cos\left( \frac{\theta_{X}}{2} \right)}P_{X}=\frac{1}{\sqrt{4-|P_{X}|^2 }}P_{X}
+$$
+则可以得到如下方程：
+$$
+Skew(P_{A_{ij}}+P_{B_{ij}})P_{X}^{&rsquo;}=P_{B_{ij}}-P_{A_{ij}}\tag{1.3}
+$$
+其中，Skew()函数表示三维向量的叉积矩阵，例如向量$V(v_{x},v_{y},v_{z})$的Skew运算为：
+$$
+Skew(V)=\begin{bmatrix}
+0 &amp; -v_{z} &amp; v_{y}  \
+v_{z} &amp; 0 &amp; -v_{x} \
+-v_{y} &amp; v_{x} &amp; 0
+\end{bmatrix}
+$$
+因为$Skew(P_{A_{ij}}+P_{B_{ij}})$的秩为2，所以至少需要三组机器人末端位姿进行标定才有解。
+假设有k组$(A_{ij},B_{ij})$数据，将数据堆叠起来，形成一个标准的超定线性方程组$Mx=b$，其中$M\in R^{3k\times3},x\in R^{3\times1},b\in R^{3k\times1}$。然后使用<strong>最小二乘法</strong>（如 SVD ）求出最优的$P_{X}^{&rsquo;}$。则
+$$
+P_{X}=\frac{{2P_{X}^{&rsquo;}}}{\sqrt{ 1+|P_{X}^{&rsquo;}|^2 }}
+$$
+再通过罗德里格斯公式求出旋转矩阵$R_{X}$：
+$$
+R_{X}=\left( 1-\frac{{|P_{X}|^2}}{2} \right)I+\frac{1}{2}(P_{X}P_{X}^T+\sqrt{ 4-|P_{X}|^2 }Skew(P_{X}))
+$$
+将式1.2中平移方程移项得到：
+$$
+(R_{A_{ij}}-I)T_{X}=R_{X}T_{B_{ij}}-T_{A_{ij}}
+$$
+同样将k组$(A_{ij},B_{ij})$数据堆叠起来形成另一个标准超定线性方程组$Mx=b$，同样用最小二乘法（如SVD）求解出最优平移量$T_{X}$。
+最终得到手眼标定结果矩阵：
+$$
+X=\begin{bmatrix}
+R_{X} &amp; T_{X}  \
+0 &amp; 1
+\end{bmatrix}
+$$</p>
+<ul>
+<li><strong>优点</strong>：计算速度极快，有封闭解（解析解），无需复杂的迭代优化，在数据无噪声的情况下能得到极高的精度。</li>
+<li><strong>缺点</strong>：由于是“两步法”，第一步求出的旋转矩阵​如果存在微小误差，这个误差会直接传递到第二步的平移计算中，导致最终结果产生偏差。因此，它对机器人的运动精度和标定板的检测精度要求较高。</li>
+</ul>
+<h3 id="123-迭代优化法">1.2.3 迭代优化法<a hidden class="anchor" aria-hidden="true" href="#123-迭代优化法">#</a></h3>
+<p>将式1.1写成如下形式：
+$$
+A_{i}X=XB_{i}
+$$
+移项可得误差项：
+$$
+E_{i}=(A_{i}X)^{-1}XB_{i}=X^{-1}A_{i}^{-1}XB_{i}
+$$
+理想情况下$E_{i}=I$。优化目标就是让$E_{i}=I$，$\log(I)=0$，所以代价函数可以设计为：
+$$
+J=\displaystyle\sum_{i=0}^{k}\parallel \log(E_{i})\parallel^2
+$$
+优化的变量是X_se3是6维向量，其自带流形约束（正交约束）所以不会出现SVD里面那样旋转矩阵不满足物理约束的情况。因为se3是表示的是变换矩阵的增量，所以迭代的初始值必须为单位矩阵。迭代的步骤为：</p>
+<ul>
+<li>对X_se3进行指数运算得到位姿变换$X=\exp(X_se3)$。</li>
+<li>计算代价函数J。</li>
+<li>如果得到最小代价函数，则X为优化结果。否则迭代X_se3继续上述步骤。</li>
+</ul>
+<p>上述理论并不复杂，实际实现的话可以使用Sophus+Ceres库，首先定义残差的计算方式：</p>
+<pre tabindex="0"><code>/*******************求解AX=XB*********************/
+// ==========================================================
+// 残差块：log(X⁻¹ * A⁻¹ * X * B)
+// 优化变量：X(6维)
+// ==========================================================
+struct AXXBResidual {
+    AXXBResidual(const Sophus::SE3d&amp; A, const Sophus::SE3d&amp; B)
+        : A_(A), B_(B) {
+    }
+
+    template &lt;typename T&gt;
+    bool operator()(const T* const x_se3, T* residual) const
+    {
+        Sophus::SE3&lt;T&gt; X = Sophus::SE3&lt;T&gt;::exp(Eigen::Map&lt;const Eigen::Matrix&lt;T, 6, 1&gt;&gt;(x_se3));
+
+        // A * X = X * B -→ X⁻¹ * A⁻¹ * X * B = 单位矩阵
+        Sophus::SE3&lt;T&gt; error = X.inverse() * A_.inverse() * X * B_;
+
+        // 误差转6维李代数
+        Eigen::Map&lt;Eigen::Matrix&lt;T, 6, 1&gt;&gt; res(residual);
+        res = error.log();
+        return true;
+    }
+    using CostFunctor = ceres::AutoDiffCostFunction&lt;AXXBResidual, 6, 6&gt;;
+
+private:
+    Sophus::SE3d A_, B_;
+};
+</code></pre><p>然后是迭代求解器：</p>
+<pre tabindex="0"><code>void solveAXXB(
+    const std::vector&lt;Sophus::SE3d&gt;&amp; A_list,
+    const std::vector&lt;Sophus::SE3d&gt;&amp; B_list,
+    Sophus::SE3d&amp; X) 
+{
+    // 初始值，单位矩阵
+    Eigen::Matrix&lt;double, 6, 1&gt; x_se3 = Eigen::Matrix&lt;double, 6, 1&gt;::Zero();
+
+    ceres::Problem problem;
+    for (int i = 0; i &lt; A_list.size(); ++i)
+    {
+        auto* cost = new AXXBResidual::CostFunctor(new AXXBResidual(A_list[i], B_list[i]));
+        problem.AddResidualBlock(cost, nullptr, x_se3.data());
+    }
+
+    // 配置
+    ceres::Solver::Options options;
+    options.linear_solver_type = ceres::DENSE_SCHUR;
+    options.minimizer_progress_to_stdout = true;
+    options.max_num_iterations = 100;
+
+    // 优化
+    ceres::Solver::Summary summary;
+    ceres::Solve(options, &amp;problem, &amp;summary);
+
+    // 输出
+    std::cout &lt;&lt; summary.BriefReport() &lt;&lt; std::endl;
+
+    // 结果
+    X = Sophus::SE3d::exp(x_se3);
+}
+</code></pre><p>最后使用模拟数据写个测试程序：</p>
+<pre tabindex="0"><code>// ==========================================================
+// AXXB模拟测试数据
+// ==========================================================
+void testAXXBCalib()
+{
+    std::cout &lt;&lt; &#34;\n===== Start AXXB Calib Optimize Test =====&#34; &lt;&lt; std::endl;
+
+    // 真值 X
+    Sophus::SE3d X_true(
+        Eigen::Quaterniond(0.9, 0.1, 0.1, 0.1).normalized(),
+        Eigen::Vector3d(0.1, 0.2, 0.3)
+    );
+
+    // 生成模拟 A B （满足 AX=XB）
+    std::vector&lt;Sophus::SE3d&gt; A_list, B_list;
+    for (int i = 0; i &lt; 10; ++i) {
+        Sophus::SE3d A = Sophus::SE3d::exp(
+            (Eigen::Matrix&lt;double, 6, 1&gt;::Random() * 0.2).eval()
+        );
+        Sophus::SE3d B = X_true.inverse() * A * X_true;
+        A_list.push_back(A);
+        B_list.push_back(B);
+    }
+
+    // 求解
+    Sophus::SE3d X;
+    solveAXXB(A_list, B_list, X);
+
+    Eigen::Matrix4d T_x_true = X_true.matrix();
+    Eigen::Matrix4d T_x_est = X.matrix();
+
+    // 输出
+    std::cout &lt;&lt; &#34;\n===== Calibrate AX=XB Test Result =====&#34; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#34;T_x_true: &#34; &lt;&lt; std::endl;
+    std::cout &lt;&lt; T_x_true &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#34;T_x_est: &#34; &lt;&lt; std::endl;
+    std::cout &lt;&lt; T_x_est &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#34;=================================&#34; &lt;&lt; std::endl;
+}
+</code></pre><p>测试输出结果如下图所示：</p>
+<p>图2 迭代优化求解AXXB测试
+<img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-handeye-calibration/images/2.png"></p>
+<ul>
+<li><strong>优点</strong>：在<strong>最小二乘意义下</strong>给出最优解精度比较高。具备<strong>流形约束</strong>不会出现旋转矩阵违背物理意义的情况。</li>
+<li><strong>缺点</strong>：对异常值敏感，如果某几组数据严重偏离正常值，得到的结果误差变大；</li>
+</ul>
+<h1 id="二axyb">二、AX=YB<a hidden class="anchor" aria-hidden="true" href="#二axyb">#</a></h1>
+<p>在图1的例子中，AX=XB的情况下，一次只能求示踪器相对于末端$^gT_{t}$和相机相对于机械臂基坐标$^bT_{c}$其中一个。如果想要采集一组数据同时求出$^gT_{t}$和$^bT_{c}$则问题就变成了AX=YB。</p>
+<h2 id="21-建模">2.1 建模<a hidden class="anchor" aria-hidden="true" href="#21-建模">#</a></h2>
+<p>AX=YB的模型比AX=XB来得更直接也更容易理解，根据机械臂链路和相机链路两条链路下，每次采样时示踪器在机械臂基坐标系下的位姿不变，可以列出如下方程：
+$$
+^bT_{g}^{(i)}\ ^gT_{t}=^bT_{c}\ ^cT_{t}^{(i)}
+$$
+上述公式有个前提条件就是在整个标定过程中，相机相对于机械臂基坐标是静止的，即$^bT_{c}$是常量。
+即：
+$$
+A_{i}X=YB_{i}\tag{1.4}
+$$
+其中$A_{i}=^bT_{g}^{(i)}$是标定过程中采集到的机械臂末端相对于基坐标的变换矩阵，$B_{i}=^cT_{t}^{(i)}$是标定过程中采集到的示踪器相对于相机的变换矩阵。需要求的$X=\ ^g{T}<em>{t}$是示踪器相对于末端的矩阵，以及$Y=\ ^bT</em>{c}$相机相对于机械臂基坐标的矩阵。</p>
+<h2 id="22-求解">2.2 求解<a hidden class="anchor" aria-hidden="true" href="#22-求解">#</a></h2>
+<div>
+</div>
+这个方程的解法很多，同样也有很多库可以调用： 
+<ul>
+<li>OpenCV的calibrateRobotWorldHandEye()函数可以同时求解X和Y。经过实测这种方法精度不如迭代优化法。</li>
+<li>对偶四元数法。</li>
+</ul>
+<h3 id="221-迭代优化法">2.2.1 迭代优化法<a hidden class="anchor" aria-hidden="true" href="#221-迭代优化法">#</a></h3>
+<p>与1.2.3中一样，将式1.4左右移项可得误差项：
+$$
+E_{i}=(YB_{i})^{-1}A_{i}X=B_{i}^{-1}Y^{-1}A_{i}X
+$$
+理想情况下$E_{i}=I$。优化目标就是让$E_{i}=I$，$\log(I)=0$，所以代价函数可以设计为：
+$$
+J=\displaystyle\sum_{i=0}^{k}\parallel \log(E_{i})\parallel^2
+$$
+优化的变量是X_se3和Y_se3都是6维向量，其自带流形约束（正交约束）所以旋转矩阵满足物理约束。因为se3是表示的是变换矩阵的增量，所以迭代的初始值必须为单位矩阵。迭代的步骤为：</p>
+<ul>
+<li>对X_se3和Y_se3进行指数运算得到位姿变换$X=\exp(X_se3),Y=\exp(Y_{se_{3}})$。</li>
+<li>计算代价函数J。</li>
+<li>如果得到最小代价函数，则X和Y为优化结果。否则迭代X_se3、Y_se3继续上述步骤。</li>
+</ul>
+<p>同样使用Sophus+Ceres库，首先定义残差的计算方式：</p>
+<pre tabindex="0"><code>/******************求解AX=YB********************/
+// ==========================================================
+// 残差块：log(B⁻¹ * Y⁻¹ * A * X)
+// 优化变量：X(6维), Y(6维)
+// ==========================================================
+struct AXYBResidual {
+    AXYBResidual(const Sophus::SE3d&amp; A, const Sophus::SE3d&amp; B)
+        : A_(A), B_(B) {
+    }
+
+    template &lt;typename T&gt;
+    bool operator()(const T* const x_se3, const T* const y_se3, T* residual) const {
+        Sophus::SE3&lt;T&gt; X = Sophus::SE3&lt;T&gt;::exp(
+            Eigen::Map&lt;const Eigen::Matrix&lt;T, 6, 1&gt;&gt;(x_se3)
+        );
+        Sophus::SE3&lt;T&gt; Y = Sophus::SE3&lt;T&gt;::exp(
+            Eigen::Map&lt;const Eigen::Matrix&lt;T, 6, 1&gt;&gt;(y_se3)
+        );
+
+        // A * X = Y * B -→ B⁻¹ * Y⁻¹ * A * X = 单位矩阵
+        Sophus::SE3&lt;T&gt; error = B_.inverse() * Y.inverse() * A_ * X;
+
+        // 误差转6维李代数
+        Eigen::Map&lt;Eigen::Matrix&lt;T, 6, 1&gt;&gt; res(residual);
+        res = error.log();
+        return true;
+    }
+    using CostFunctor = ceres::AutoDiffCostFunction&lt;AXYBResidual, 6, 6, 6&gt;;
+
+private:
+    Sophus::SE3d A_, B_;
+};
+</code></pre><p>然后是迭代求解器：</p>
+<pre tabindex="0"><code>void solveAXYB(
+    const std::vector&lt;Sophus::SE3d&gt;&amp; A_list,
+    const std::vector&lt;Sophus::SE3d&gt;&amp; B_list,
+    Sophus::SE3d&amp; X,
+    Sophus::SE3d&amp; Y)
+{
+    // 初始值 单位矩阵
+    Eigen::Matrix&lt;double, 6, 1&gt; x_se3 = Eigen::Matrix&lt;double, 6, 1&gt;::Zero();
+    Eigen::Matrix&lt;double, 6, 1&gt; y_se3 = Eigen::Matrix&lt;double, 6, 1&gt;::Zero();
+
+    ceres::Problem problem;
+    for (int i = 0; i &lt; A_list.size(); ++i) {
+        auto* cost = new AXYBResidual::CostFunctor(new AXYBResidual(A_list[i], B_list[i]));
+        problem.AddResidualBlock(cost, nullptr, x_se3.data(), y_se3.data());
+    }
+
+    // 配置
+    ceres::Solver::Options options;
+    options.linear_solver_type = ceres::DENSE_SCHUR;
+    options.minimizer_progress_to_stdout = true;
+    options.max_num_iterations = 100;
+
+    // 优化
+    ceres::Solver::Summary summary;
+    ceres::Solve(options, &amp;problem, &amp;summary);
+
+    // 输出
+    std::cout &lt;&lt; summary.BriefReport() &lt;&lt; std::endl;
+
+    // 结果
+    X = Sophus::SE3d::exp(x_se3);
+    Y = Sophus::SE3d::exp(y_se3);
+}
+</code></pre><p>最后使用模拟数据写个测试程序：</p>
+<pre tabindex="0"><code>// ==========================================================
+// AX=YB模拟测试数据
+// ==========================================================
+void testAXYBCalib()
+{
+    std::cout &lt;&lt; &#34;\n===== Start AXYB Calib Optimize Test =====&#34; &lt;&lt; std::endl;
+
+    // 真值 X Y
+    Sophus::SE3d X_true(
+        Eigen::Quaterniond(0.9, 0.1, 0.1, 0.1).normalized(),
+        Eigen::Vector3d(0.1, 0.2, 0.3)
+    );
+    Sophus::SE3d Y_true(
+        Eigen::Quaterniond(0.85, 0.15, 0.15, 0.1).normalized(),
+        Eigen::Vector3d(0.4, 0.5, 0.6)
+    );
+    
+    // 生成模拟 A B （满足 AX=YB）
+    std::vector&lt;Sophus::SE3d&gt; A_list, B_list;
+    for (int i = 0; i &lt; 10; ++i) {
+        Sophus::SE3d A = Sophus::SE3d::exp(
+            (Eigen::Matrix&lt;double, 6, 1&gt;::Random() * 0.2).eval()
+        );
+        Sophus::SE3d B = Y_true.inverse() * A * X_true;
+        A_list.push_back(A);
+        B_list.push_back(B);
+    }
+
+    // 求解
+    Sophus::SE3d X, Y;
+    solveAXYB(A_list, B_list, X, Y);
+
+    Eigen::Matrix4d T_x_true = X_true.matrix();
+    Eigen::Matrix4d T_y_true = Y_true.matrix();
+    Eigen::Matrix4d T_x_est = X.matrix();
+    Eigen::Matrix4d T_y_est = Y.matrix();
+
+    // 输出
+    std::cout &lt;&lt; &#34;\n===== Calibrate AX=YB Test Result =====&#34; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#34;T_x_true: &#34; &lt;&lt; std::endl;
+    std::cout &lt;&lt; T_x_true &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#34;T_x_est: &#34; &lt;&lt; std::endl;
+    std::cout &lt;&lt; T_x_est &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#34;T_y_est: &#34; &lt;&lt; std::endl;
+    std::cout &lt;&lt; T_y_est &lt;&lt; std::endl;
+    std::cout &lt;&lt; &#34;=================================&#34; &lt;&lt; std::endl;
+}
+</code></pre><p>测试输出结果如下图所示：</p>
+<p>图3 迭代优化求解AXYB测试
+<img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-handeye-calibration/images/3.png"></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://hugoooool.github.io/tags/%E6%9C%BA%E6%A2%B0%E8%87%82/">机械臂</a></li>
+      <li><a href="https://hugoooool.github.io/tags/%E6%89%8B%E7%9C%BC%E6%A0%87%E5%AE%9A/">手眼标定</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://hugoooool.github.io/papers/control-algorithm/matlab-and-mpc-1/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>基于MATLAB的MPC系统设计与实现一</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share 机械臂手眼标定 on x"
+            href="https://x.com/intent/tweet/?text=%e6%9c%ba%e6%a2%b0%e8%87%82%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a&amp;url=https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f&amp;hashtags=%e6%9c%ba%e6%a2%b0%e8%87%82%2c%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share 机械臂手眼标定 on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f&amp;title=%e6%9c%ba%e6%a2%b0%e8%87%82%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a&amp;summary=%e6%9c%ba%e6%a2%b0%e8%87%82%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a&amp;source=https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share 机械臂手眼标定 on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f&title=%e6%9c%ba%e6%a2%b0%e8%87%82%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share 机械臂手眼标定 on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share 机械臂手眼标定 on whatsapp"
+            href="https://api.whatsapp.com/send?text=%e6%9c%ba%e6%a2%b0%e8%87%82%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a%20-%20https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share 机械臂手眼标定 on telegram"
+            href="https://telegram.me/share/url?text=%e6%9c%ba%e6%a2%b0%e8%87%82%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a&amp;url=https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share 机械臂手眼标定 on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=%e6%9c%ba%e6%a2%b0%e8%87%82%e6%89%8b%e7%9c%bc%e6%a0%87%e5%ae%9a&u=https%3a%2f%2fhugoooool.github.io%2fpapers%2frobot-algorithm%2frobot-handeye-calibration%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/adityatelange/hugo-PaperMod/graphs/contributors">PaperMod Contributors</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

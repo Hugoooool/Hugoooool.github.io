@@ -3,6 +3,9 @@
 
 ## 文章
 
+### 机械臂算法笔记
+- [机械臂手眼标定](https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/)
+
 ### 控制算法笔记
 - [基于MATLAB的MPC系统设计与实现一](https://hugoooool.github.io/papers/control-algorithm/matlab-and-mpc-1/)
 
