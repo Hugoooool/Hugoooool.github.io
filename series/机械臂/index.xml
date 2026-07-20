@@ -7,49 +7,21 @@
     <generator>Hugo</generator>
     <language>zh</language>
     <copyright>PaperMod Contributors</copyright>
-    <lastBuildDate>Tue, 19 May 2026 16:05:29 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 20 Jul 2026 18:25:32 +0800</lastBuildDate>
     <atom:link href="https://hugoooool.github.io/series/%E6%9C%BA%E6%A2%B0%E8%87%82/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>机械臂运动学</title>
+      <link>https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/</link>
+      <pubDate>Mon, 20 Jul 2026 18:25:32 +0800</pubDate>
+      <guid>https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/</guid>
+      <description>介绍了Kuka iiwa14和UR5两种机械臂的正逆运动学</description>
+    </item>
     <item>
       <title>机械臂手眼标定</title>
       <link>https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/</link>
       <pubDate>Tue, 19 May 2026 16:05:29 +0800</pubDate>
       <guid>https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/</guid>
-      <description>&lt;p&gt;机械臂的手眼标定无论是eye-in-hand还是eye-to-hand，都可以建模成求解AX=XB或求解AX=YB这两种情况。下文就以eye-to-hand为例，分别探讨一下这两种方程如何求解。&lt;/p&gt;
-&lt;h1 id=&#34;一axxb&#34;&gt;一、AX=XB&lt;/h1&gt;
-&lt;h2 id=&#34;11-建模&#34;&gt;1.1 建模&lt;/h2&gt;
-&lt;p&gt;首先约定各坐标系名称为：Base&amp;ndash;机械臂基坐标系；Grip&amp;ndash;机械臂末端坐标系；Tracker&amp;ndash;机械臂末端示踪器坐标系；Camera&amp;ndash;相机坐标系；&lt;/p&gt;
-&lt;h3 id=&#34;111-根据示踪器到机械臂末端之间位置不变建模&#34;&gt;1.1.1 根据示踪器到机械臂末端之间位置不变建模&lt;/h3&gt;
-&lt;p&gt;当机械臂分别处于如下图所示i和j的位置时，由于末端示踪器相对于机械臂末端之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^gT_{t}$都相同。基于这个条件列出方程：
-$$
-^gT_{b}^{(i)} \ ^bT_{c} \ ^cT_{t}^{(i)} = ^gT_{b}^{(j)} \ ^bT_{c} \ ^cT_{t}^{(j)}
-$$
-将方程两边分别左乘$(^gT_{b}^{(j)})^{-1}$以及右乘$(^cT_{t}^{(i)})^{-1}$得：
-$$
-(^gT_{b}^{(j)})^{-1} \ ^gT_{b}^{(i)}\ ^bT_{c}=^bT_{c}\ ^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}
-$$
-其中$^bT_{c}$是未知的，$^gT_{b}$通过机械臂正解可以得到，$^cT_{t}$可以通过获取相机数据得到。所以上式可以写成：
-$$
-A_{ij}X=XB_{ij}\tag{1.1}
-$$
-其中$A_{ij}=(^gT_{b}^{(j)})^{-1}\ ^gT_{b}^{(i)}$，$B_{ij}=^cT_{t}^{(j)}(^cT_{t}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^bT_{c}$是要求的相机相对于机械臂基坐标的变换矩阵。&lt;/p&gt;
-&lt;p&gt;图1 eye-to-hand手眼标定
-&lt;img alt=&#34;alt&#34; loading=&#34;lazy&#34; src=&#34;https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/images/1.png&#34;&gt;&lt;/p&gt;
-&lt;h3 id=&#34;112-根据相机到机械臂基坐标之间位置不变建模&#34;&gt;1.1.2 根据相机到机械臂基坐标之间位置不变建模&lt;/h3&gt;
-&lt;p&gt;还是图一中当机械臂分别处于i和j的位置时，由于相机相对于机械臂基坐标之间的位置关系是相对固定的，所以无论机械臂运动到哪个位置$^bT_{c}$都相同。基于这个条件列出方程：
-$$
-^bT_{g}^{(i)} \ ^gT_{t} \ ^tT_{c}^{(i)} = ^bT_{g}^{(j)} \ ^gT_{t} \ ^tT_{c}^{(j)}
-$$
-同样将方程两边分别左乘$(^bT_{g}^{(j)})^{-1}$以及右乘$(^tT_{c}^{(i)})^{-1}$得：
-$$
-(^bT_{g}^{(j)})^{-1} \ ^bT_{g}^{(i)}\ ^gT_{t}=^gT_{t}\ ^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}
-$$
-其中$^gT_{t}$是未知的，$^bT_{g}$通过机械臂正解可以得到，$^tT_{c}$可以通过获取相机数据得到。所以上式可以写成：
-$$
-A_{ij}X=XB_{ij}
-$$
-其中$A_{ij}=(^bT_{g}^{(j)})^{-1}\ ^bT_{g}^{(i)}$，$B_{ij}=^tT_{c}^{(j)}(^tT_{c}^{(i)})^{-1}$。i和j分别表示第i次测量和j次测量。$X=^gT_{t}$是要求的示踪器相对于机械臂末端的变换矩阵。&lt;/p&gt;
-&lt;h2 id=&#34;12-求解&#34;&gt;1.2 求解&lt;/h2&gt;
-&lt;p&gt;无论哪种方式建模，得到的都是AX=XB的形式，这个方程的解法很多，也有很多库可以调用：&lt;/p&gt;</description>
+      <description>介绍了几种手眼标定的原理和求解方法</description>
     </item>
   </channel>
 </rss>
