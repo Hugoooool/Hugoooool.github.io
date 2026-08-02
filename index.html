@@ -252,11 +252,11 @@
         </header>
         <div class="entry-content">
             <p>一、Kuka iiwa14正运动学 1.1 DH法 DH参数在很多文章中都有介绍，本文就不再赘述了，这里只给出结果。 文献[1]中的DH参数经过实际验证是与实际机械臂相符的。
-其中的参数在iiwa14机械臂中具体为： $$d_{bs}=0.36, d_{se}=0.42, d_{ew}=0.4, d_{wf}=0.126$$ 有了DH参数，求解正运动学就变得很简单了，直接看代码：
+其中的参数在iiwa14机械臂中具体为： $$d_{bs}=0.36, d_{se}=0.42, d_{ew}=0.4, d_{wf}=0.126$$ 有了DH参数，求解正运动学就变得很简单了，相邻坐标系之间的变换关系如下： $$ ^{i-1}T_{i}=\begin{bmatrix} \cos\theta_{i} &amp; -\sin\theta_{i}\cos\alpha_{i} &amp; \sin\theta_{i}\sin\alpha_{i} &amp; a_{i}\cos\theta_{i} \\ \sin\theta_{i} &amp; \cos\theta_{i}\cos\alpha_{i} &amp; -\cos\theta_{i}\sin\alpha_{i} &amp; a_{i}\sin\theta_{i} \\ 0 &amp; \sin\alpha_{i} &amp; \cos\alpha_{i} &amp; d_{i} \\ 0 &amp; 0 &amp; 0 &amp; 1 \end{bmatrix} $$ 正运动学解就是： $$ ^0T_{7}=^0T_{1}^1T_{2}^2T_{3}^3T_{4}^4T_{5}^5T_{6}^6T_{7} $$ 代码如下：
 HomogeneousMatrix IIWA_Kinematics::computeTransform(const DHParams&amp; dh) { double ct = cos(dh.theta); double st = sin(dh.theta); double ca = cos(dh.alpha); double sa = sin(dh.alpha); HomogeneousMatrix T; T &lt;&lt; ct, -st * ca, st* sa, dh.a* ct, st, ct* ca, -ct * sa, dh.a* st, 0, sa, ca, dh.d, 0, 0, 0, 1; return T; } HomogeneousMatrix IIWA_Kinematics::iiwa14_fk_dh(const Matrix&lt;double, 7, 1&gt; joint_angles) { HomogeneousMatrix T_total = HomogeneousMatrix::Identity(); for (size_t i = 0; i &lt; dh_params.size(); &#43;&#43;i) { dh_params[i].theta = joint_angles[i]; T_total = T_total * computeTransform(dh_params[i]); } return T_total; } 1.2 旋量（PoE）法 DH法依赖局部坐标系，建立坐标系的方法不同得到的参数就不一样。用旋量法来描述机械臂就不依赖局部坐标系，它的核心思想是：在基座固定坐标系下，把每个关节的运动看成绕某条螺旋轴的旋转/平移，用矩阵指数描述单关节运动，再按顺序连乘得到末端位姿。 首先确定零位，即当各关节角度都为0时，机械臂末端相对于基坐标的位姿矩阵，iiwa14机械臂的零位矩阵为： $$T_{0}=\begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 1 &amp; 1.306 \\ 0 &amp; 0 &amp; 0 &amp; 1 \end{bmatrix}$$
 ...</p>
         </div>
-        <footer class="entry-footer"><span title='2026-07-20 18:25:32 +0800 +0800'>2026年7月20日</span>&nbsp;·&nbsp;<span>2 分钟</span>&nbsp;·&nbsp;<span>Hugoooool</span></footer>
+        <footer class="entry-footer"><span title='2026-07-20 18:25:32 +0800 +0800'>2026年7月20日</span>&nbsp;·&nbsp;<span>4 分钟</span>&nbsp;·&nbsp;<span>Hugoooool</span></footer>
     </div>
     <div class="entry-cover-wrapper"> 
 <figure class="entry-cover">
