@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>机械臂运动学 | Hugoooool的博客</title>
+<title>7轴机械臂运动学 | Hugoooool的博客</title>
 <meta name="keywords" content="机械臂">
-<meta name="description" content="介绍了Kuka iiwa14和UR5两种机械臂的正逆运动学">
+<meta name="description" content="介绍了Kuka iiwa14机械臂的正逆运动学">
 <meta name="author" content="Hugoooool">
-<link rel="canonical" href="https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/">
+<link rel="canonical" href="https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.acd1e4a8bff2d847ae6f63fa5ab251227e0cbd53b9943b684293f403b3057fd5.css" integrity="sha256-rNHkqL/y2Eeub2P6WrJRIn4MvVO5lDtoQpP0A7MFf9U=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://hugoooool.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://hugoooool.github.io/favicon-16x16.png">
@@ -18,7 +18,7 @@
 <link rel="mask-icon" href="https://hugoooool.github.io/favicon.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/">
+<link rel="alternate" hreflang="zh" href="https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/">
 <noscript>
     <style>
         #theme-toggle,
@@ -82,22 +82,22 @@
             {left: '$', right: '$', display: false}
         ]
     });">
-</script><meta property="og:url" content="https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/">
+</script><meta property="og:url" content="https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/">
   <meta property="og:site_name" content="Hugoooool的博客">
-  <meta property="og:title" content="机械臂运动学">
-  <meta property="og:description" content="介绍了Kuka iiwa14和UR5两种机械臂的正逆运动学">
+  <meta property="og:title" content="7轴机械臂运动学">
+  <meta property="og:description" content="介绍了Kuka iiwa14机械臂的正逆运动学">
   <meta property="og:locale" content="zh">
   <meta property="og:type" content="article">
     <meta property="article:section" content="papers">
     <meta property="article:published_time" content="2026-07-20T18:25:32+08:00">
     <meta property="article:modified_time" content="2026-07-20T18:25:32+08:00">
     <meta property="article:tag" content="机械臂">
-    <meta property="og:image" content="https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1.png">
+    <meta property="og:image" content="https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1.png">
       <meta property="og:see_also" content="https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1.png">
-  <meta name="twitter:title" content="机械臂运动学">
-  <meta name="twitter:description" content="介绍了Kuka iiwa14和UR5两种机械臂的正逆运动学">
+<meta name="twitter:image" content="https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1.png">
+  <meta name="twitter:title" content="7轴机械臂运动学">
+  <meta name="twitter:description" content="介绍了Kuka iiwa14机械臂的正逆运动学">
 
 
 <script type="application/ld+json">
@@ -120,8 +120,8 @@
     {
       "@type": "ListItem",
       "position":  3 ,
-      "name": "机械臂运动学",
-      "item": "https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/"
+      "name": "7轴机械臂运动学",
+      "item": "https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/"
     }
   ]
 }
@@ -130,16 +130,16 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "机械臂运动学",
-  "name": "机械臂运动学",
-  "description": "介绍了Kuka iiwa14和UR5两种机械臂的正逆运动学",
+  "headline": "7轴机械臂运动学",
+  "name": "7轴机械臂运动学",
+  "description": "介绍了Kuka iiwa14机械臂的正逆运动学",
   "keywords": [
     "机械臂"
   ],
-  "articleBody": "一、Kuka iiwa14正运动学 1.1 DH法 DH参数在很多文章中都有介绍，本文就不再赘述了，这里只给出结果。 文献[1]中的DH参数经过实际验证是与实际机械臂相符的。\n其中的参数在iiwa14机械臂中具体为： $$d_{bs}=0.36, d_{se}=0.42, d_{ew}=0.4, d_{wf}=0.126$$ 有了DH参数，求解正运动学就变得很简单了，相邻坐标系之间的变换关系如下： $$ ^{i-1}T_{i}=\\begin{bmatrix} \\cos\\theta_{i} \u0026 -\\sin\\theta_{i}\\cos\\alpha_{i} \u0026 \\sin\\theta_{i}\\sin\\alpha_{i} \u0026 a_{i}\\cos\\theta_{i} \\\\ \\sin\\theta_{i} \u0026 \\cos\\theta_{i}\\cos\\alpha_{i} \u0026 -\\cos\\theta_{i}\\sin\\alpha_{i} \u0026 a_{i}\\sin\\theta_{i} \\\\ 0 \u0026 \\sin\\alpha_{i} \u0026 \\cos\\alpha_{i} \u0026 d_{i} \\\\ 0 \u0026 0 \u0026 0 \u0026 1 \\end{bmatrix} $$ 正运动学解就是： $$ ^0T_{7}=^0T_{1}^1T_{2}^2T_{3}^3T_{4}^4T_{5}^5T_{6}^6T_{7} $$ 代码如下：\nHomogeneousMatrix IIWA_Kinematics::computeTransform(const DHParams\u0026 dh) { double ct = cos(dh.theta); double st = sin(dh.theta); double ca = cos(dh.alpha); double sa = sin(dh.alpha); HomogeneousMatrix T; T \u003c\u003c ct, -st * ca, st* sa, dh.a* ct, st, ct* ca, -ct * sa, dh.a* st, 0, sa, ca, dh.d, 0, 0, 0, 1; return T; } HomogeneousMatrix IIWA_Kinematics::iiwa14_fk_dh(const Matrix joint_angles) { HomogeneousMatrix T_total = HomogeneousMatrix::Identity(); for (size_t i = 0; i \u003c dh_params.size(); ++i) { dh_params[i].theta = joint_angles[i]; T_total = T_total * computeTransform(dh_params[i]); } return T_total; } 1.2 旋量（PoE）法 DH法依赖局部坐标系，建立坐标系的方法不同得到的参数就不一样。用旋量法来描述机械臂就不依赖局部坐标系，它的核心思想是：在基座固定坐标系下，把每个关节的运动看成绕某条螺旋轴的旋转/平移，用矩阵指数描述单关节运动，再按顺序连乘得到末端位姿。 首先确定零位，即当各关节角度都为0时，机械臂末端相对于基坐标的位姿矩阵，iiwa14机械臂的零位矩阵为： $$T_{0}=\\begin{bmatrix} 1 \u0026 0 \u0026 0 \u0026 0 \\\\ 0 \u0026 1 \u0026 0 \u0026 0 \\\\ 0 \u0026 0 \u0026 1 \u0026 1.306 \\\\ 0 \u0026 0 \u0026 0 \u0026 1 \\end{bmatrix}$$\n然后确定每个关节对应的旋量轴。\n取各轴线上一点在基坐标系下的坐标。 在基坐标系下取关节轴单位旋转方向$\\omega_{i}$（转动关节）或设$\\omega_{i}=0$（移动关节），并计算线速度部分$v_{i}=-\\omega_{i}\\times q_{i}$（转动关节）或$v_{i}=$平移方向单位向量（移动关节）。 从而得到空间旋量： $$\\xi_{i}=\\begin{bmatrix} \\omega_{i} \\\\ v_{i} \\end{bmatrix}$$ $T_{0}$和$\\xi_{i}$就是旋量法所需要的全部参数。\n正运动学方程为： $$T(\\theta)=e^{[\\xi_{1}]\\theta_{1}}e^{[\\xi_{2}]\\theta_{2}}\\dots e^{[\\xi_{n}]\\theta_{n}}T_{0}$$ 代码如下：\nHomogeneousMatrix IIWA_Kinematics::iiwa14_fk_poe(const Eigen::Matrix\u0026 q) { Eigen::Matrix4d T = Eigen::Matrix4d::Identity(); for (int i = 0; i \u003c 7; ++i) { Eigen::Matrix4d T_temp = Eigen::Matrix4d::Identity(); Eigen::Matrix omega = iiwa14_screws[i].block(0, 0, 3, 1); Eigen::Matrix vel = iiwa14_screws[i].block(3, 0, 3, 1); if (std::abs(q[i]) \u003c 1e-10) // 处理小角度情况 { T_temp = Eigen::Matrix4d::Identity(); } else { double sin_theta = sin(q[i]); double one_minus_cos = 1 - cos(q[i]); Eigen::Matrix3d W; W \u003c\u003c 0, -omega[2], omega[1], omega[2], 0, -omega[0], -omega[1], omega[0], 0; // 旋转部分 Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin_theta * W + one_minus_cos * W * W; // 平移部分 Eigen::Matrix3d V = Eigen::Matrix3d::Identity() * q[i] + one_minus_cos * W + (q[i] - sin_theta) * W * W; Eigen::Matrix t = V * vel; T_temp.block(0, 0, 3, 3) = R; T_temp.block(0, 3, 3, 1) = t; } T *= T_temp; } T *= M_zero; return T; } 二、Kuka iiwa14逆运动学 2.1 解析解法 2.1.1 自运动参数 七自由度非偏置仿人型机械臂具有S-R-S（球面-旋转-球面）运动学结构，逆运动学有无数组解。为了解决全局和局部自运动流形的问题，在逆运动学计算中引入了两个额外的参数。第一个叫全局配置（GC），唯一指定了全局配置流形中逆运动学解的分支。第二个参数叫臂型角（$\\psi$），表示冗余圆中的肘部位置。在正向运动学问题中，GC和ψ变量均直接由关节角度确定，并作为参数传递给所提出的逆向运动学算法。全局配置$GC_{k}$参数被拆分为3个变量，分别表示肩部（$GC_{2}$）、肘部（$GC_{4}$）和腕部（$GC_{6}$）关节角度坐标的正负号。这些变量随后对机械臂在空间中的布置产生控制作用。$GC_{k}$由下式给出： $$ GC_{k}= \\left[\\begin{aligned} \u00261,\\ \\ \\ \\ \\ \\ \\ if\\ \\ \\theta_{k}\\geq 0 \\\\ \u0026-1,\\ \\ if\\ \\ \\ \\theta_{k}\u003c0 \\end{aligned}\\ \\ \\ \\ , \\ \\ \\ \\forall k\\in{2,4,6} \\right . $$ 机械臂在空间中的布置直接受到肩部、肘部和腕部关节运动链（$GC_{k}$）的影响。 臂型角，表示肩部-肘部-腕部平面（$SEW$）与参考平面（$SE^vW$）所形成的角度，如下图所示。 肘部的冗余度仅取决于机械臂的结构以及肩部到腕部的向量。$\\psi$圆的圆心位于连接肩部与腕部的直线距离的一半处，其曲线内接于由肩部-腕部向量所定义的平面内。“真实机械臂”描绘了一个处于任意姿态的7自由度（7-DoF）机械臂。“虚拟机械臂”则是该机械臂的非冗余（6自由度，6-DoF）复制品，且达到相同的姿态。通过将第3个关节锁定为零（$\\theta_{3}=0$），真实机械臂被转换为虚拟机械臂。\n2.1.2 肘部冗余 臂型角$\\psi$是实际机械臂$SEW$平面的法向量与虚拟（非冗余）机械臂$SE^vW$平面的法向量之间的夹角。然而，此陈述有一个小问题，因为同一平面可以由其向量和其负向量共同定义。这种不确定性对我们的研究问题具有重要意义，因为参考SEW平面向量的定义取决于虚拟机械臂的全局配置，即肘部是向上还是向下。为了唯一确定一个参考平面向量，我们将机器人配置变量GC与参考平面的计算相关联。 很容易证明，对于相同的目标姿态，真实机器人和虚拟机器人的肩部和腕部位置是相同的。因此，我们只需知道虚拟机械臂的肘部位置，即可找到参考平面，进而计算出ψ。应用六自由度虚拟机械臂的逆运动学表达式来求解其肘部位置。虚拟机械臂的关节位置将用上标$\\theta_{i}^v$表示。 设目标姿态由变换矩阵$^0T_{7}$表示，该矩阵结合了位置分量$^0p_{7}\\in \\mathbb{R}^3$ 和旋转分量$^0R_{7}\\in SO(3)$。为了简化以下方程的表示，我们根据DH参数列出从肩部到基座（$^0p_{2}$）、肘部到肩部（$^2p_{4}$）、腕部到肘部（$^4p_{6}$）以及法兰到腕部（$^6p_{7}$）的向量： $$ \\begin{aligned} \u0026^0p_{2}=\\begin{bmatrix} 0 \u0026 0 \u0026 d_{bs} \\end{bmatrix}^T \\\\ \u0026^2p_{4}=\\begin{bmatrix} 0 \u0026 d_{se} \u0026 0 \\end{bmatrix}^T \\\\ \u0026^4p_{6}=\\begin{bmatrix} 0 \u0026 0 \u0026 d_{ew} \\end{bmatrix}^T \\\\ \u0026^6p_{7}=\\begin{bmatrix} 0 \u0026 0 \u0026 d_{wf} \\end{bmatrix}^T \\end{aligned} $$ 首先计算的是虚拟肘关节（$\\theta_{4}^v$），因为它仅取决于机械臂的运动学结构和肩腕矢量。肩腕矢量是通过以下公式计算得出的： $$ ^2p_{6}=^0p_{7}-^0p_{2}-(^0R_{7}\\cdot^6p_{7}) $$ $\\theta_{4}^v$可以通过如下公式求出： $$ \\theta_{4}^v=GC_{4}\\arccos(\\frac{\\rVert^2p_{6}\\rVert^2-(d_{se})^2-(d_{ew})^2}{2d_{se}d_{ew}}) \\tag{1} $$ 肘部配置变量（$GC_{4}$）——即第四关节角度的信号是唯一确定参考平面所必需的。 由于$\\theta_{3}^v$为0，肩肘矢量$^2p_{4}$以及肘腕矢量$^4p_{6}$在xy平面上对齐。因此，关节$\\theta_{1}^v$负责将虚拟手臂移动到手腕的x和y位置坐标。 然而，如果肩腕向量$^2p_{6}$与关节1的z轴$^0R_{1,z}$对齐，那么关节1的定义将不再存在，从而出现算法奇点。因此，$\\theta_{1}^v$的计算将分为以下步骤： $$ \\theta_{1}^v= \\left[ \\begin{array}{rcl} \u0026atan2(^2p_{6,y},^2p_{6,x}), \u0026 \u0026 if\\ \\ \\rVert ^2p_{6}\\ \\times \\ ^0R_{1,z} \\rVert \u003e 0 \\\\ \u00260, \u0026 \u0026 if\\ \\ \\rVert ^2p_{6} \\ \\times \\ ^0R_{1,z} \\rVert=0 \\end{array} \\right . $$ 虚拟肩关节$\\theta_{2}^v$是确定虚拟肘部位置所缺失的最后一个变量。如下图所示，可根据余弦定理计算出$\\phi$： $$ \\phi=\\arccos(\\frac{(d_{se})^2+\\rVert^2p_{6} \\rVert^2-(d_{ew})^2} {2d_{se}\\rVert ^2p_{6} \\rVert}) $$ $\\theta_{2}^v$取决于肘关节的配置： $$ \\theta_{2}^v=atan2(\\sqrt{ (^2p_{6,x})^2+(^2p_{6,y})^2 },\\ ^2p_{6,z})+GC_{4}\\phi $$ 利用θv1、θv2、θv3和θv4，我们可以通过正向运动学计算虚拟肘部相对于基座的位姿$^0T_{4}^v$。现在，平面的法向量$V_{sew}^v$是通过连接肩部-肘部和肩部-腕部的单位向量的叉积来计算的： $$ V_{sew}^v=(\\frac{^0p_{4}^v-^0p_{2}^v}{\\rVert ^0p_{4}^v-^0p_{2}^v \\rVert})\\times(\\frac{^0p_{6}^v-^0p_{2}^v}{\\rVert ^0p_{6}^v-^0p_{2}^v\\rVert}) $$ 真实机械臂SEW平面的法向量$V_{sew}$是使用相同的公式，但将真实肘部的位置代入计算得出的： $$ V_{sew}=(\\frac{^0p_{4}-^0p_{2}}{\\rVert ^0p_{4}-^0p_{2} \\rVert})\\times(\\frac{^0p_{6}-^0p_{2}}{\\rVert ^0p_{6}-^0p_{2} \\rVert}) $$ 设$\\psi\\in[-\\pi, \\pi]$，且$\\psi$在参考平面处为0。臂角参数的符号确定为： $$ sg_{\\psi}=sgn[(\\hat{V_{sew}^v} \\times \\hat{V_{sew}})\\cdot\\ ^2p_{6}] $$ 则$\\psi$为： $$ \\psi=sg_{\\psi}\\ \\arccos(\\hat{V_{sew}^v}\\cdot \\hat{V_{sew}}) $$ 由于臂型角$\\psi$、关节构型GC以及最终机器人位姿$^0T_{7}$现已确定，因此在任务空间中存在对机器人构型的完整描述，该描述映射到关节空间中的唯一操作器构型。\n2.1.3 逆运动学 所述的逆运动学算法基于将机械臂分为上臂和下臂的标准方法，上臂负责定位，下臂负责定向。与正向运动学根据关节位置计算最终位姿$^0T_{7}$和自运动参数（$\\psi$，GC）的方式相同，逆运动学反过来需要这三个变量来生成一组关节位置。 第一步是确定肩-腕向量$^2p_{6}$。由于虚拟机械臂所用的方程同样适用于真实机器人，且其肩部和腕部的位置是重合的，因此该方程同样适用于真实机器人。此外，由于肩部到腕部的向量相同，因此肘关节$\\theta_{4}$也可以用公式1计算得出。 $\\theta_{4}$是唯一一个不依赖于$\\psi$的关节角度。为了确定其他关节角度，我们需要找到真实机械臂肘部的位置。为此，首先我们需要按照上一节中描述的算法，计算参考平面$^0T_{4}^v$上的虚拟肘部位姿。真实肘部位姿只是虚拟肘部位姿绕$\\psi$的肩-腕轴$^2p_{6}$旋转后的结果： $$ ^0R_{4}=\\ ^0R_{\\psi}\\ ^0R_{4}^v $$ 等价于 $$ ^0R_{3}=\\ ^0R_{\\psi}\\ ^0R_{3}^v $$ 因为$\\theta_{4}$在虚拟和真实机械臂上是相等的，因此$^3R_{4}^v=\\ ^3R_{4}$。 肘部冗余旋转矩阵$^0R_{\\psi}$编码了围绕肩-腕向量$^2p_{6}$的角度$\\psi$的旋转。该矩阵使用矩阵表示法的罗德里格斯旋转公式进行计算： $$ ^0R_{\\psi}=I_{3}+\\sin(\\psi)[\\hat{^2p_{6}}\\times]+(1-\\cos(\\psi))[\\hat{^2p_{6}}\\times]^2 $$ 其中$[\\hat{^2p_{6}}\\times]$是单位向量$\\hat{^2p_{6}}$的叉积矩阵。 将上述公式代入$^0R_{3}$并简化表示方法可得： $$ ^0R_{3}=A_{s}\\sin(\\psi)+B_{s}\\cos(\\psi)+C_{s} $$ 其中， $$ \\begin{aligned} \u0026A_{s}=[\\hat{^2p_{6}}\\times]\\ ^0R_{3}^v \\\\ \u0026B_{s}=-[\\hat{^2p_{6}}\\times]^2\\ ^0R_{3}^v \\\\ \u0026C_{s}=[\\hat{^2p_{6}}\\hat{^2p_{6}}^T]\\ ^0R_{3}^v \\end{aligned} $$ 现在，通过三角运算结合从DH参数导出的$^0R_{3}(\\theta_{1,2,3})$矩阵的元素，可以解析地确定$\\theta_{1}$、$\\theta_{2}$和$\\theta_{3}$的实际值： $$ ^0R_{3}(\\theta_{1,2,3})= \\begin{bmatrix} ** \u0026 \\cos\\theta_{1}\\sin\\theta_{2} \u0026 ** \\\\ ** \u0026 \\sin\\theta_{1}\\sin\\theta_{2} \u0026 ** \\\\ -\\sin\\theta_{2}\\cos\\theta_{3} \u0026 \\cos\\theta_{2} \u0026 -\\sin\\theta_{2}\\sin\\theta_{3} \\end{bmatrix} $$\n符号**表示矩阵中省略的元素，这些元素在关节位置计算中并非必需。需要注意的是，这些关节角度受全局配置参数GC的影响，因此： $$ \\begin{aligned} \\theta_{1}=atan2(\u0026GC_{2}[a_{s22}\\sin\\psi+b_{s22}\\cos\\psi+c_{s22}],\\\\ \u0026GC_{2}[a_{s12}\\sin\\psi+b_{s12}\\cos\\psi+c_{s12}]) \\end{aligned} $$ $$ \\theta_{2}=GC_{2}\\arccos(a_{s32}\\sin\\psi+b_{s32}\\cos\\psi+c_{s32}) $$ $$ \\begin{aligned} \\theta_{3}=atan2(\u0026GC_{2}[-a_{s33}\\sin\\psi-b_{s32}\\cos\\psi-c_{s33}],\\\\ \u0026GC_{2}[-a_{s31}\\sin\\psi-b_{s31}\\cos\\psi-c_{s31}]) \\end{aligned} $$ 一旦我们知道了相对于肩关节的旋转矩阵$^0R_{3}$，计算腕关节的旋转矩阵$^4R_{7}$就变得十分直接： $$ ^4R_{7}=A_{w}\\sin(\\psi)+B_{w}\\cos(\\psi)+C_{w} $$ 其中， $$ \\begin{aligned} \u0026A_{w}=\\ ^3R_{4}^T\\ A_{s}^T\\ ^0R_{7} \\\\ \u0026B_{w}=\\ ^3R_{4}^T\\ B_{s}^T\\ ^0R_{7} \\\\ \u0026C_{w}=\\ ^3R_{4}^T\\ C_{s}^T\\ ^0R_{7} \\end{aligned} $$ 现在，我们可以根据$^4R_{7}(\\theta_{5,6,7})$矩阵的元素，通过分析来推断出手腕关节的关节位置： $$ ^4R_{7}(\\theta_{5,6,7})= \\begin{bmatrix} ** \u0026 ** \u0026 \\cos\\theta_{5}\\sin\\theta_{6} \\\\ ** \u0026 ** \u0026 \\sin\\theta_{5}\\sin\\theta_{6} \\\\ -\\sin\\theta_{6}\\cos\\theta_{7} \u0026 \\sin\\theta_{6}\\sin\\theta_{7} \u0026 \\cos\\theta_{6} \\end{bmatrix} $$ 根据全局配置参数，计算剩余的关节角度： $$ \\begin{aligned} \\theta_{5}=atan2(\u0026GC_{6}[a_{w23}\\sin\\psi+b_{w23}\\cos\\psi+c_{w23}],\\\\ \u0026GC_{6}[a_{w13}\\sin\\psi+b_{w13}\\cos\\psi+c_{w13}]) \\end{aligned} $$ $$ \\theta_{6}=GC_{6}\\arccos(a_{w33}\\sin\\psi+b_{w33}\\cos\\psi+c_{w33}) $$ $$ \\begin{aligned} \\theta_{7}=atan2(\u0026GC_{6}[a_{w32}\\sin\\psi+b_{w32}\\cos\\psi+c_{w32}],\\\\ \u0026GC_{6}[-a_{w31}\\sin\\psi-b_{w31}\\cos\\psi-c_{w31}]) \\end{aligned} $$ 总之，关节角度是基于目标位姿$^0T_{7}$以及两个辅助参数，手臂角度$\\psi$和关节配置GC来唯一确定的。\n参考文献 [1] Position-based kinematics for 7-DoF serial manipulators with global configuration control, joint limit and singularity avoidance. Carlos Fariaa, Flora Ferreira, etc.\n",
-  "wordCount" : "677",
+  "articleBody": "一、Kuka iiwa14正运动学 1.1 DH法 DH参数在很多文章中都有介绍，本文就不再赘述了，这里只给出结果。 文献[1]中的DH参数经过实际验证是与实际机械臂相符的。\n其中的参数在iiwa14机械臂中具体为： $$d_{bs}=0.36, d_{se}=0.42, d_{ew}=0.4, d_{wf}=0.126$$ 有了DH参数，求解正运动学就变得很简单了，相邻坐标系之间的变换关系如下： $$ ^{i-1}T_{i}=\\begin{bmatrix} \\cos\\theta_{i} \u0026 -\\sin\\theta_{i}\\cos\\alpha_{i} \u0026 \\sin\\theta_{i}\\sin\\alpha_{i} \u0026 a_{i}\\cos\\theta_{i} \\\\ \\sin\\theta_{i} \u0026 \\cos\\theta_{i}\\cos\\alpha_{i} \u0026 -\\cos\\theta_{i}\\sin\\alpha_{i} \u0026 a_{i}\\sin\\theta_{i} \\\\ 0 \u0026 \\sin\\alpha_{i} \u0026 \\cos\\alpha_{i} \u0026 d_{i} \\\\ 0 \u0026 0 \u0026 0 \u0026 1 \\end{bmatrix} $$ 正运动学解就是： $$ ^0T_{7}=^0T_{1}^1T_{2}^2T_{3}^3T_{4}^4T_{5}^5T_{6}^6T_{7} $$ 代码如下：\nHomogeneousMatrix IIWA_Kinematics::computeTransform(const DHParams\u0026 dh) { double ct = cos(dh.theta); double st = sin(dh.theta); double ca = cos(dh.alpha); double sa = sin(dh.alpha); HomogeneousMatrix T; T \u003c\u003c ct, -st * ca, st* sa, dh.a* ct, st, ct* ca, -ct * sa, dh.a* st, 0, sa, ca, dh.d, 0, 0, 0, 1; return T; } HomogeneousMatrix IIWA_Kinematics::iiwa14_fk_dh(const Matrix joint_angles) { HomogeneousMatrix T_total = HomogeneousMatrix::Identity(); for (size_t i = 0; i \u003c dh_params.size(); ++i) { dh_params[i].theta = joint_angles[i]; T_total = T_total * computeTransform(dh_params[i]); } return T_total; } 1.2 旋量（PoE）法 DH法依赖局部坐标系，建立坐标系的方法不同得到的参数就不一样。用旋量法来描述机械臂就不依赖局部坐标系，它的核心思想是：在基座固定坐标系下，把每个关节的运动看成绕某条螺旋轴的旋转/平移，用矩阵指数描述单关节运动，再按顺序连乘得到末端位姿。 首先确定零位，即当各关节角度都为0时，机械臂末端相对于基坐标的位姿矩阵，iiwa14机械臂的零位矩阵为： $$T_{0}=\\begin{bmatrix} 1 \u0026 0 \u0026 0 \u0026 0 \\\\ 0 \u0026 1 \u0026 0 \u0026 0 \\\\ 0 \u0026 0 \u0026 1 \u0026 1.306 \\\\ 0 \u0026 0 \u0026 0 \u0026 1 \\end{bmatrix}$$\n然后确定每个关节对应的旋量轴。\n取各轴线上一点在基坐标系下的坐标。 在基坐标系下取关节轴单位旋转方向$\\omega_{i}$（转动关节）或设$\\omega_{i}=0$（移动关节），并计算线速度部分$v_{i}=-\\omega_{i}\\times q_{i}$（转动关节）或$v_{i}=$平移方向单位向量（移动关节）。 从而得到空间旋量： $$\\xi_{i}=\\begin{bmatrix} \\omega_{i} \\\\ v_{i} \\end{bmatrix}$$ $T_{0}$和$\\xi_{i}$就是旋量法所需要的全部参数。\n正运动学方程为： $$T(\\theta)=e^{[\\xi_{1}]\\theta_{1}}e^{[\\xi_{2}]\\theta_{2}}\\dots e^{[\\xi_{n}]\\theta_{n}}T_{0}$$ 代码如下：\nHomogeneousMatrix IIWA_Kinematics::iiwa14_fk_poe(const Eigen::Matrix\u0026 q) { Eigen::Matrix4d T = Eigen::Matrix4d::Identity(); for (int i = 0; i \u003c 7; ++i) { Eigen::Matrix4d T_temp = Eigen::Matrix4d::Identity(); Eigen::Matrix omega = iiwa14_screws[i].block(0, 0, 3, 1); Eigen::Matrix vel = iiwa14_screws[i].block(3, 0, 3, 1); if (std::abs(q[i]) \u003c 1e-10) // 处理小角度情况 { T_temp = Eigen::Matrix4d::Identity(); } else { double sin_theta = sin(q[i]); double one_minus_cos = 1 - cos(q[i]); Eigen::Matrix3d W; W \u003c\u003c 0, -omega[2], omega[1], omega[2], 0, -omega[0], -omega[1], omega[0], 0; // 旋转部分 Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin_theta * W + one_minus_cos * W * W; // 平移部分 Eigen::Matrix3d V = Eigen::Matrix3d::Identity() * q[i] + one_minus_cos * W + (q[i] - sin_theta) * W * W; Eigen::Matrix t = V * vel; T_temp.block(0, 0, 3, 3) = R; T_temp.block(0, 3, 3, 1) = t; } T *= T_temp; } T *= M_zero; return T; } 二、Kuka iiwa14逆运动学 2.1 解析解法 2.1.1 自运动参数 七自由度非偏置仿人型机械臂具有S-R-S（球面-旋转-球面）运动学结构，逆运动学有无数组解。为了解决全局和局部自运动流形的问题，在逆运动学计算中引入了两个额外的参数。第一个叫全局配置（GC），唯一指定了全局配置流形中逆运动学解的分支。第二个参数叫臂型角（$\\psi$），表示冗余圆中的肘部位置。在正向运动学问题中，GC和ψ变量均直接由关节角度确定，并作为参数传递给所提出的逆向运动学算法。全局配置$GC_{k}$参数被拆分为3个变量，分别表示肩部（$GC_{2}$）、肘部（$GC_{4}$）和腕部（$GC_{6}$）关节角度坐标的正负号。这些变量随后对机械臂在空间中的布置产生控制作用。$GC_{k}$由下式给出： $$ GC_{k}= \\left[\\begin{aligned} \u00261,\\ \\ \\ \\ \\ \\ \\ if\\ \\ \\theta_{k}\\geq 0 \\\\ \u0026-1,\\ \\ if\\ \\ \\ \\theta_{k}\u003c0 \\end{aligned}\\ \\ \\ \\ , \\ \\ \\ \\forall k\\in{2,4,6} \\right . $$ 机械臂在空间中的布置直接受到肩部、肘部和腕部关节运动链（$GC_{k}$）的影响。 臂型角，表示肩部-肘部-腕部平面（$SEW$）与参考平面（$SE^vW$）所形成的角度，如下图所示。 肘部的冗余度仅取决于机械臂的结构以及肩部到腕部的向量。$\\psi$圆的圆心位于连接肩部与腕部的直线距离的一半处，其曲线内接于由肩部-腕部向量所定义的平面内。“真实机械臂”描绘了一个处于任意姿态的7自由度（7-DoF）机械臂。“虚拟机械臂”则是该机械臂的非冗余（6自由度，6-DoF）复制品，且达到相同的姿态。通过将第3个关节锁定为零（$\\theta_{3}=0$），真实机械臂被转换为虚拟机械臂。\n2.1.2 肘部冗余 臂型角$\\psi$是实际机械臂$SEW$平面的法向量与虚拟（非冗余）机械臂$SE^vW$平面的法向量之间的夹角。然而，此陈述有一个小问题，因为同一平面可以由其向量和其负向量共同定义。这种不确定性对我们的研究问题具有重要意义，因为参考SEW平面向量的定义取决于虚拟机械臂的全局配置，即肘部是向上还是向下。为了唯一确定一个参考平面向量，我们将机器人配置变量GC与参考平面的计算相关联。 很容易证明，对于相同的目标姿态，真实机器人和虚拟机器人的肩部和腕部位置是相同的。因此，我们只需知道虚拟机械臂的肘部位置，即可找到参考平面，进而计算出ψ。应用六自由度虚拟机械臂的逆运动学表达式来求解其肘部位置。虚拟机械臂的关节位置将用上标$\\theta_{i}^v$表示。 设目标姿态由变换矩阵$^0T_{7}$表示，该矩阵结合了位置分量$^0p_{7}\\in \\mathbb{R}^3$ 和旋转分量$^0R_{7}\\in SO(3)$。为了简化以下方程的表示，我们根据DH参数列出从肩部到基座（$^0p_{2}$）、肘部到肩部（$^2p_{4}$）、腕部到肘部（$^4p_{6}$）以及法兰到腕部（$^6p_{7}$）的向量： $$ \\begin{aligned} \u0026^0p_{2}=\\begin{bmatrix} 0 \u0026 0 \u0026 d_{bs} \\end{bmatrix}^T \\\\ \u0026^2p_{4}=\\begin{bmatrix} 0 \u0026 d_{se} \u0026 0 \\end{bmatrix}^T \\\\ \u0026^4p_{6}=\\begin{bmatrix} 0 \u0026 0 \u0026 d_{ew} \\end{bmatrix}^T \\\\ \u0026^6p_{7}=\\begin{bmatrix} 0 \u0026 0 \u0026 d_{wf} \\end{bmatrix}^T \\end{aligned} $$ 首先计算的是虚拟肘关节（$\\theta_{4}^v$），因为它仅取决于机械臂的运动学结构和肩腕矢量。肩腕矢量是通过以下公式计算得出的： $$ ^2p_{6}=^0p_{7}-^0p_{2}-(^0R_{7}\\cdot^6p_{7}) $$ $\\theta_{4}^v$可以通过如下公式求出： $$ \\theta_{4}^v=GC_{4}\\arccos(\\frac{\\rVert^2p_{6}\\rVert^2-(d_{se})^2-(d_{ew})^2}{2d_{se}d_{ew}}) \\tag{1} $$ 肘部配置变量（$GC_{4}$）——即第四关节角度的信号是唯一确定参考平面所必需的。 由于$\\theta_{3}^v$为0，肩肘矢量$^2p_{4}$以及肘腕矢量$^4p_{6}$在xy平面上对齐。因此，关节$\\theta_{1}^v$负责将虚拟手臂移动到手腕的x和y位置坐标。 然而，如果肩腕向量$^2p_{6}$与关节1的z轴$^0R_{1,z}$对齐，那么关节1的定义将不再存在，从而出现算法奇点。因此，$\\theta_{1}^v$的计算将分为以下步骤： $$ \\theta_{1}^v= \\left[ \\begin{array}{rcl} \u0026atan2(^2p_{6,y},^2p_{6,x}), \u0026 \u0026 if\\ \\ \\rVert ^2p_{6}\\ \\times \\ ^0R_{1,z} \\rVert \u003e 0 \\\\ \u00260, \u0026 \u0026 if\\ \\ \\rVert ^2p_{6} \\ \\times \\ ^0R_{1,z} \\rVert=0 \\end{array} \\right . $$ 虚拟肩关节$\\theta_{2}^v$是确定虚拟肘部位置所缺失的最后一个变量。如下图所示，可根据余弦定理计算出$\\phi$： $$ \\phi=\\arccos(\\frac{(d_{se})^2+\\rVert^2p_{6} \\rVert^2-(d_{ew})^2} {2d_{se}\\rVert ^2p_{6} \\rVert}) $$ $\\theta_{2}^v$取决于肘关节的配置： $$ \\theta_{2}^v=atan2(\\sqrt{ (^2p_{6,x})^2+(^2p_{6,y})^2 },\\ ^2p_{6,z})+GC_{4}\\phi $$ 利用θv1、θv2、θv3和θv4，我们可以通过正向运动学计算虚拟肘部相对于基座的位姿$^0T_{4}^v$。现在，平面的法向量$V_{sew}^v$是通过连接肩部-肘部和肩部-腕部的单位向量的叉积来计算的： $$ V_{sew}^v=(\\frac{^0p_{4}^v-^0p_{2}^v}{\\rVert ^0p_{4}^v-^0p_{2}^v \\rVert})\\times(\\frac{^0p_{6}^v-^0p_{2}^v}{\\rVert ^0p_{6}^v-^0p_{2}^v\\rVert}) $$ 真实机械臂SEW平面的法向量$V_{sew}$是使用相同的公式，但将真实肘部的位置代入计算得出的： $$ V_{sew}=(\\frac{^0p_{4}-^0p_{2}}{\\rVert ^0p_{4}-^0p_{2} \\rVert})\\times(\\frac{^0p_{6}-^0p_{2}}{\\rVert ^0p_{6}-^0p_{2} \\rVert}) $$ 设$\\psi\\in[-\\pi, \\pi]$，且$\\psi$在参考平面处为0。臂角参数的符号确定为： $$ sg_{\\psi}=sgn[(\\hat{V_{sew}^v} \\times \\hat{V_{sew}})\\cdot\\ ^2p_{6}] $$ 则$\\psi$为： $$ \\psi=sg_{\\psi}\\ \\arccos(\\hat{V_{sew}^v}\\cdot \\hat{V_{sew}}) $$ 由于臂型角$\\psi$、关节构型GC以及最终机器人位姿$^0T_{7}$现已确定，因此在任务空间中存在对机器人构型的完整描述，该描述映射到关节空间中的唯一操作器构型。\n2.1.3 逆运动学 所述的逆运动学算法基于将机械臂分为上臂和下臂的标准方法，上臂负责定位，下臂负责定向。与正向运动学根据关节位置计算最终位姿$^0T_{7}$和自运动参数（$\\psi$，GC）的方式相同，逆运动学反过来需要这三个变量来生成一组关节位置。 第一步是确定肩-腕向量$^2p_{6}$。由于虚拟机械臂所用的方程同样适用于真实机器人，且其肩部和腕部的位置是重合的，因此该方程同样适用于真实机器人。此外，由于肩部到腕部的向量相同，因此肘关节$\\theta_{4}$也可以用公式1计算得出。 $\\theta_{4}$是唯一一个不依赖于$\\psi$的关节角度。为了确定其他关节角度，我们需要找到真实机械臂肘部的位置。为此，首先我们需要按照上一节中描述的算法，计算参考平面$^0T_{4}^v$上的虚拟肘部位姿。真实肘部位姿只是虚拟肘部位姿绕$\\psi$的肩-腕轴$^2p_{6}$旋转后的结果： $$ ^0R_{4}=\\ ^0R_{\\psi}\\ ^0R_{4}^v $$ 等价于 $$ ^0R_{3}=\\ ^0R_{\\psi}\\ ^0R_{3}^v $$ 因为$\\theta_{4}$在虚拟和真实机械臂上是相等的，因此$^3R_{4}^v=\\ ^3R_{4}$。 肘部冗余旋转矩阵$^0R_{\\psi}$编码了围绕肩-腕向量$^2p_{6}$的角度$\\psi$的旋转。该矩阵使用矩阵表示法的罗德里格斯旋转公式进行计算： $$ ^0R_{\\psi}=I_{3}+\\sin(\\psi)[\\hat{^2p_{6}}\\times]+(1-\\cos(\\psi))[\\hat{^2p_{6}}\\times]^2 $$ 其中$[\\hat{^2p_{6}}\\times]$是单位向量$\\hat{^2p_{6}}$的叉积矩阵。 将上述公式代入$^0R_{3}$并简化表示方法可得： $$ ^0R_{3}=A_{s}\\sin(\\psi)+B_{s}\\cos(\\psi)+C_{s} $$ 其中， $$ \\begin{aligned} \u0026A_{s}=[\\hat{^2p_{6}}\\times]\\ ^0R_{3}^v \\\\ \u0026B_{s}=-[\\hat{^2p_{6}}\\times]^2\\ ^0R_{3}^v \\\\ \u0026C_{s}=[\\hat{^2p_{6}}\\hat{^2p_{6}}^T]\\ ^0R_{3}^v \\end{aligned} $$ 现在，通过三角运算结合从DH参数导出的$^0R_{3}(\\theta_{1,2,3})$矩阵的元素，可以解析地确定$\\theta_{1}$、$\\theta_{2}$和$\\theta_{3}$的实际值： $$ ^0R_{3}(\\theta_{1,2,3})= \\begin{bmatrix} ** \u0026 \\cos\\theta_{1}\\sin\\theta_{2} \u0026 ** \\\\ ** \u0026 \\sin\\theta_{1}\\sin\\theta_{2} \u0026 ** \\\\ -\\sin\\theta_{2}\\cos\\theta_{3} \u0026 \\cos\\theta_{2} \u0026 -\\sin\\theta_{2}\\sin\\theta_{3} \\end{bmatrix} $$\n符号**表示矩阵中省略的元素，这些元素在关节位置计算中并非必需。需要注意的是，这些关节角度受全局配置参数GC的影响，因此： $$ \\begin{aligned} \\theta_{1}=atan2(\u0026GC_{2}[a_{s22}\\sin\\psi+b_{s22}\\cos\\psi+c_{s22}],\\\\ \u0026GC_{2}[a_{s12}\\sin\\psi+b_{s12}\\cos\\psi+c_{s12}]) \\end{aligned} $$ $$ \\theta_{2}=GC_{2}\\arccos(a_{s32}\\sin\\psi+b_{s32}\\cos\\psi+c_{s32}) $$ $$ \\begin{aligned} \\theta_{3}=atan2(\u0026GC_{2}[-a_{s33}\\sin\\psi-b_{s32}\\cos\\psi-c_{s33}],\\\\ \u0026GC_{2}[-a_{s31}\\sin\\psi-b_{s31}\\cos\\psi-c_{s31}]) \\end{aligned} $$ 一旦我们知道了相对于肩关节的旋转矩阵$^0R_{3}$，计算腕关节的旋转矩阵$^4R_{7}$就变得十分直接： $$ ^4R_{7}=A_{w}\\sin(\\psi)+B_{w}\\cos(\\psi)+C_{w} $$ 其中， $$ \\begin{aligned} \u0026A_{w}=\\ ^3R_{4}^T\\ A_{s}^T\\ ^0R_{7} \\\\ \u0026B_{w}=\\ ^3R_{4}^T\\ B_{s}^T\\ ^0R_{7} \\\\ \u0026C_{w}=\\ ^3R_{4}^T\\ C_{s}^T\\ ^0R_{7} \\end{aligned} $$ 现在，我们可以根据$^4R_{7}(\\theta_{5,6,7})$矩阵的元素，通过分析来推断出手腕关节的关节位置： $$ ^4R_{7}(\\theta_{5,6,7})= \\begin{bmatrix} ** \u0026 ** \u0026 \\cos\\theta_{5}\\sin\\theta_{6} \\\\ ** \u0026 ** \u0026 \\sin\\theta_{5}\\sin\\theta_{6} \\\\ -\\sin\\theta_{6}\\cos\\theta_{7} \u0026 \\sin\\theta_{6}\\sin\\theta_{7} \u0026 \\cos\\theta_{6} \\end{bmatrix} $$ 根据全局配置参数，计算剩余的关节角度： $$ \\begin{aligned} \\theta_{5}=atan2(\u0026GC_{6}[a_{w23}\\sin\\psi+b_{w23}\\cos\\psi+c_{w23}],\\\\ \u0026GC_{6}[a_{w13}\\sin\\psi+b_{w13}\\cos\\psi+c_{w13}]) \\end{aligned} $$ $$ \\theta_{6}=GC_{6}\\arccos(a_{w33}\\sin\\psi+b_{w33}\\cos\\psi+c_{w33}) $$ $$ \\begin{aligned} \\theta_{7}=atan2(\u0026GC_{6}[a_{w32}\\sin\\psi+b_{w32}\\cos\\psi+c_{w32}],\\\\ \u0026GC_{6}[-a_{w31}\\sin\\psi-b_{w31}\\cos\\psi-c_{w31}]) \\end{aligned} $$ 总之，关节角度是基于目标位姿$^0T_{7}$以及两个辅助参数，手臂角度$\\psi$和关节配置GC来唯一确定的。\n2.2 数值解法 逆运动学的本质是给定末端位姿： $$ T_{target}\\in SE(3) $$ 求关节角： $$ q=[q_{1},q_{2},\\dots,q_{7}]^T $$ 使得： $$ T_{fk}(q)\\approx T_{target} $$ 即理想情况下$E(q)=T_{target}^{-1}T_{fk}(q)=I$是单位阵。优化目标就是让$E(q)=I$，$\\log(I)=0$，所以代价函数可以设计为： $$ J=\\parallel \\log(E(q))\\parallel^2=\\parallel \\log(T_{target}^{-1}T_{fk}(q))\\parallel^2 $$ 迭代的步骤为：\n对给定的q进行正运动学求解得到$T_{fk}(q)$； 计算代价函数J； 如果J小于某个给定精度（如$10^{-4}$），则q为优化结果。否则更新q继续上述迭代步骤。 使用Sophus+Ceres库，首先定义残差的计算方式： /// /// iiwa14逆解残差，用DH计算正解 /// struct iiwa14_IKCostFunctor_DH { iiwa14_IKCostFunctor_DH(const Sophus::SE3d\u0026 T) : T_goal(T) {} template bool operator()(const T* const q_ptr, T* residual) const { Eigen::Map",
+  "wordCount" : "1383",
   "inLanguage": "zh",
-  "image":"https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1.png","datePublished": "2026-07-20T18:25:32+08:00",
+  "image":"https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1.png","datePublished": "2026-07-20T18:25:32+08:00",
   "dateModified": "2026-07-20T18:25:32+08:00",
   "author":{
     "@type": "Person",
@@ -147,7 +147,7 @@
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/"
+    "@id": "https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/"
   },
   "publisher": {
     "@type": "Organization",
@@ -228,19 +228,19 @@
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://hugoooool.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://hugoooool.github.io/papers/">文章</a>&nbsp;»&nbsp;<a href="https://hugoooool.github.io/papers/robot-algorithm/">机械臂算法笔记</a></div>
     <h1 class="post-title entry-hint-parent">
-      机械臂运动学
+      7轴机械臂运动学
     </h1>
     <div class="post-description">
-      介绍了Kuka iiwa14和UR5两种机械臂的正逆运动学
+      介绍了Kuka iiwa14机械臂的正逆运动学
     </div>
-    <div class="post-meta"><span title='2026-07-20 18:25:32 +0800 +0800'>2026年7月20日</span>&nbsp;·&nbsp;<span>4 分钟</span>&nbsp;·&nbsp;<span>Hugoooool</span>
+    <div class="post-meta"><span title='2026-07-20 18:25:32 +0800 +0800'>2026年7月20日</span>&nbsp;·&nbsp;<span>7 分钟</span>&nbsp;·&nbsp;<span>Hugoooool</span>
 
 </div>
   </header> 
 <figure class="entry-cover">
             <img loading="eager"
-                srcset='https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1_hu_de620047c17bfec0.png 360w,https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1_hu_4a01f8d0517e4417.png 480w,https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1_hu_e3b2e94b9a620ff9.png 720w,https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1.png 792w'
-                src="https://hugoooool.github.io/papers/robot-algorithm/robot-kinematics/images/1.png"
+                srcset='https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1_hu_de620047c17bfec0.png 360w,https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1_hu_4a01f8d0517e4417.png 480w,https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1_hu_e3b2e94b9a620ff9.png 720w,https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1.png 792w'
+                src="https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/images/1.png"
                 sizes="(min-width: 768px) 720px, 100vw"
                 width="792" height="440"
                 alt="">
@@ -273,7 +273,11 @@
                         <a href="#212-%e8%82%98%e9%83%a8%e5%86%97%e4%bd%99" aria-label="2.1.2 肘部冗余">2.1.2 肘部冗余</a></li>
                     <li>
                         <a href="#213-%e9%80%86%e8%bf%90%e5%8a%a8%e5%ad%a6" aria-label="2.1.3 逆运动学">2.1.3 逆运动学</a></li></ul>
-                    </li></ul>
+                    </li>
+                    <li>
+                        <a href="#22-%e6%95%b0%e5%80%bc%e8%a7%a3%e6%b3%95" aria-label="2.2 数值解法">2.2 数值解法</a></li>
+                    <li>
+                        <a href="#23-%e5%b0%8f%e7%bb%93" aria-label="2.3 小结">2.3 小结</a></li></ul>
                     </li>
                     <li>
                         <a href="#%e5%8f%82%e8%80%83%e6%96%87%e7%8c%ae" aria-label="参考文献">参考文献</a>
@@ -385,7 +389,7 @@
 <h2 id="11-dh法">1.1 DH法<a hidden class="anchor" aria-hidden="true" href="#11-dh法">#</a></h2>
 <p>DH参数在很多文章中都有介绍，本文就不再赘述了，这里只给出结果。
 文献[1]中的DH参数经过实际验证是与实际机械臂相符的。</p>
-<p><img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-kinematics/images/2.png"></p>
+<p><img alt="alt" loading="lazy" src="/papers/robot-algorithm/7-axis-robot-kinematics/images/2.png"></p>
 <p>其中的参数在iiwa14机械臂中具体为：
 $$d_{bs}=0.36, d_{se}=0.42, d_{ew}=0.4, d_{wf}=0.126$$
 有了DH参数，求解正运动学就变得很简单了，相邻坐标系之间的变换关系如下：
@@ -436,11 +440,11 @@ $$T_{0}=\begin{bmatrix}
 0 &amp; 0 &amp; 0 &amp; 1
 \end{bmatrix}$$</p>
 <p>然后确定每个关节对应的旋量轴。</p>
-<p><img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-kinematics/images/3.png">
+<p><img alt="alt" loading="lazy" src="/papers/robot-algorithm/7-axis-robot-kinematics/images/3.png">
 取各轴线上一点在基坐标系下的坐标。
-<img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-kinematics/images/4.png">
+<img alt="alt" loading="lazy" src="/papers/robot-algorithm/7-axis-robot-kinematics/images/4.png">
 在基坐标系下取关节轴单位旋转方向$\omega_{i}$（转动关节）或设$\omega_{i}=0$（移动关节），并计算线速度部分$v_{i}=-\omega_{i}\times q_{i}$（转动关节）或$v_{i}=$平移方向单位向量（移动关节）。
-<img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-kinematics/images/5.png">
+<img alt="alt" loading="lazy" src="/papers/robot-algorithm/7-axis-robot-kinematics/images/5.png">
 从而得到空间旋量：
 $$\xi_{i}=\begin{bmatrix}
 \omega_{i} \\ v_{i}
@@ -501,7 +505,7 @@ GC_{k}=
 $$
 机械臂在空间中的布置直接受到肩部、肘部和腕部关节运动链（$GC_{k}$）的影响。
 臂型角，表示肩部-肘部-腕部平面（$SEW$）与参考平面（$SE^vW$）所形成的角度，如下图所示。
-<img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-kinematics/images/1.png">
+<img alt="alt" loading="lazy" src="/papers/robot-algorithm/7-axis-robot-kinematics/images/1.png">
 肘部的冗余度仅取决于机械臂的结构以及肩部到腕部的向量。$\psi$圆的圆心位于连接肩部与腕部的直线距离的一半处，其曲线内接于由肩部-腕部向量所定义的平面内。“真实机械臂”描绘了一个处于任意姿态的7自由度（7-DoF）机械臂。“虚拟机械臂”则是该机械臂的非冗余（6自由度，6-DoF）复制品，且达到相同的姿态。通过将第3个关节锁定为零（$\theta_{3}=0$），真实机械臂被转换为虚拟机械臂。</p>
 <h3 id="212-肘部冗余">2.1.2 肘部冗余<a hidden class="anchor" aria-hidden="true" href="#212-肘部冗余">#</a></h3>
 <p>臂型角$\psi$是实际机械臂$SEW$平面的法向量与虚拟（非冗余）机械臂$SE^vW$平面的法向量之间的夹角。然而，此陈述有一个小问题，因为同一平面可以由其向量和其负向量共同定义。这种不确定性对我们的研究问题具有重要意义，因为参考SEW平面向量的定义取决于虚拟机械臂的全局配置，即肘部是向上还是向下。为了唯一确定一个参考平面向量，我们将机器人配置变量GC与参考平面的计算相关联。
@@ -539,7 +543,7 @@ $$
 $$
 \phi=\arccos(\frac{(d_{se})^2+\rVert^2p_{6} \rVert^2-(d_{ew})^2} {2d_{se}\rVert ^2p_{6} \rVert})
 $$
-<img alt="alt" loading="lazy" src="/papers/robot-algorithm/robot-kinematics/images/6.png">
+<img alt="alt" loading="lazy" src="/papers/robot-algorithm/7-axis-robot-kinematics/images/6.png">
 $\theta_{2}^v$取决于肘关节的配置：
 $$
 \theta_{2}^v=atan2(\sqrt{ (^2p_{6,x})^2+(^2p_{6,y})^2 },\ ^2p_{6,z})+GC_{4}\phi
@@ -653,6 +657,198 @@ $$
 \end{aligned}
 $$
 总之，关节角度是基于目标位姿$^0T_{7}$以及两个辅助参数，手臂角度$\psi$和关节配置GC来唯一确定的。</p>
+<h2 id="22-数值解法">2.2 数值解法<a hidden class="anchor" aria-hidden="true" href="#22-数值解法">#</a></h2>
+<p>逆运动学的本质是给定末端位姿：
+$$
+T_{target}\in SE(3)
+$$
+求关节角：
+$$
+q=[q_{1},q_{2},\dots,q_{7}]^T
+$$
+使得：
+$$
+T_{fk}(q)\approx T_{target}
+$$
+即理想情况下$E(q)=T_{target}^{-1}T_{fk}(q)=I$是单位阵。优化目标就是让$E(q)=I$，$\log(I)=0$，所以代价函数可以设计为：
+$$
+J=\parallel \log(E(q))\parallel^2=\parallel \log(T_{target}^{-1}T_{fk}(q))\parallel^2
+$$
+迭代的步骤为：</p>
+<ul>
+<li>对给定的q进行正运动学求解得到$T_{fk}(q)$；</li>
+<li>计算代价函数J；</li>
+<li>如果J小于某个给定精度（如$10^{-4}$），则q为优化结果。否则更新q继续上述迭代步骤。
+使用Sophus+Ceres库，首先定义残差的计算方式：</li>
+</ul>
+<pre tabindex="0"><code>/// &lt;summary&gt;
+/// iiwa14逆解残差，用DH计算正解
+/// &lt;/summary&gt;
+struct iiwa14_IKCostFunctor_DH
+{
+    iiwa14_IKCostFunctor_DH(const Sophus::SE3d&amp; T) : T_goal(T) {}
+
+    template &lt;typename T&gt;
+    bool operator()(const T* const q_ptr, T* residual) const
+    {
+        Eigen::Map&lt;const Eigen::Matrix&lt;T, 7, 1&gt;&gt; q(q_ptr);
+        Eigen::Matrix&lt;T, 4, 4&gt; T_total = Eigen::Matrix&lt;T, 4, 4&gt;::Identity();
+        for (size_t i = 0; i &lt; iiwa14_dh.size(); ++i)
+        {
+            T d = iiwa14_dh[i].cast&lt;T&gt;()[0];
+            T a = iiwa14_dh[i].cast&lt;T&gt;()[1];
+            T alpha = iiwa14_dh[i].cast&lt;T&gt;()[2];
+            T ct = cos(q[i]);
+            T st = sin(q[i]);
+            T ca = cos(alpha);
+            T sa = sin(alpha);
+            Eigen::Matrix&lt;T, 4, 4&gt; T_temp = Eigen::Matrix&lt;T, 4, 4&gt;::Identity();
+            T_temp &lt;&lt; ct, -st * ca, st* sa, a* ct,
+                st, ct* ca, -ct * sa, a* st,
+                T(0), sa, ca, d,
+                T(0), T(0), T(0), T(1);
+            T_total = T_total * T_temp;
+        }
+        Sophus::SE3&lt;T&gt; T_now(T_total);
+
+        // 6维残差
+        Sophus::SE3&lt;T&gt; T_goal_T = T_goal.cast&lt;T&gt;();
+        Sophus::SE3&lt;T&gt; err = T_goal_T.inverse() * T_now;
+        Eigen::Map&lt;Eigen::Matrix&lt;T, 6, 1&gt;&gt; res(residual);
+        res = err.log();
+        return true;
+    }
+private:
+    Sophus::SE3d T_goal;
+    // iiwa14的DH参数d,a,alpha
+    std::vector&lt;Eigen::Matrix&lt;double, 3, 1&gt;&gt; iiwa14_dh = {
+        (Eigen::Matrix&lt;double, 3, 1&gt;() &lt;&lt; 0.36, 0.0, -M_PI / 2.0).finished(),
+        (Eigen::Matrix&lt;double, 3, 1&gt;() &lt;&lt; 0.0, 0.0, M_PI / 2.0).finished(),
+        (Eigen::Matrix&lt;double, 3, 1&gt;() &lt;&lt; 0.42, 0.0, M_PI / 2.0).finished(),
+        (Eigen::Matrix&lt;double, 3, 1&gt;() &lt;&lt; 0.0, 0.0, -M_PI / 2.0).finished(),
+        (Eigen::Matrix&lt;double, 3, 1&gt;() &lt;&lt; 0.4, 0.0, -M_PI / 2.0).finished(),
+        (Eigen::Matrix&lt;double, 3, 1&gt;() &lt;&lt; 0.0, 0.0, M_PI / 2.0).finished(),
+        (Eigen::Matrix&lt;double, 3, 1&gt;() &lt;&lt; 0.126, 0.0, 0).finished()
+    };
+};
+</code></pre><p>还可以用旋量法计算正解：</p>
+<pre tabindex="0"><code>/// &lt;summary&gt;
+/// iiwa14逆解残差，用poe法计算正解
+/// &lt;/summary&gt;
+struct iiwa14_IKCostFunctor_poe
+{
+    iiwa14_IKCostFunctor_poe(const Sophus::SE3d&amp; T) : T_goal(T) {}
+
+    template &lt;typename T&gt;
+    bool operator()(const T* const q_ptr, T* residual) const
+    {
+        Eigen::Map&lt;const Eigen::Matrix&lt;T, 7, 1&gt;&gt; q(q_ptr);
+        Sophus::SE3&lt;T&gt; T_now;
+        for (int i = 0; i &lt; 7; ++i)
+        {
+            Sophus::SE3&lt;T&gt; T_temp;
+            Eigen::Matrix&lt;T, 3, 1&gt; omega = iiwa14_screws[i].cast&lt;T&gt;().block(0, 0, 3, 1);
+            Eigen::Matrix&lt;T, 3, 1&gt; vel = iiwa14_screws[i].cast&lt;T&gt;().block(3, 0, 3, 1);
+            T sin_theta = sin(q[i]);
+            T one_minus_cos = T(1) - cos(q[i]);
+            Eigen::Matrix&lt;T, 3, 3&gt; W;
+            W &lt;&lt; T(0), -omega[2], omega[1],
+                omega[2], T(0), -omega[0],
+                -omega[1], omega[0], T(0);
+            // 旋转部分
+            Eigen::Matrix&lt;T, 3, 3&gt; R = Eigen::Matrix&lt;T, 3, 3&gt;::Identity() +
+                sin_theta * W + one_minus_cos * W * W;
+            // 平移部分
+            Eigen::Matrix&lt;T, 3, 1&gt; t = (Eigen::Matrix&lt;T, 3, 3&gt;::Identity() * q[i] + one_minus_cos *
+                W + (q[i] - sin_theta) * W * W) * vel;
+            T_temp = Sophus::SE3&lt;T&gt;(R, t);
+            T_now *= T_temp;
+        }
+        T_now *= Sophus::SE3&lt;T&gt;(M.cast&lt;T&gt;());
+
+        // 6维残差
+        Sophus::SE3&lt;T&gt; T_goal_T = T_goal.cast&lt;T&gt;();
+        Sophus::SE3&lt;T&gt; err = T_goal_T.inverse() * T_now;
+        Eigen::Map&lt;Eigen::Matrix&lt;T, 6, 1&gt;&gt; res(residual);
+        res = err.log();
+        return true;
+    }
+private:
+    Sophus::SE3d T_goal;
+    // iiwa14的旋量参数
+    const std::vector&lt;Eigen::Matrix&lt;double, 6, 1&gt;&gt; iiwa14_screws = {
+        (Eigen::Matrix&lt;double, 6, 1&gt;() &lt;&lt; 0, 0, 1, 0, 0, 0).finished(),
+        (Eigen::Matrix&lt;double, 6, 1&gt;() &lt;&lt; 0, 1, 0, -0.36, 0, 0).finished(),
+        (Eigen::Matrix&lt;double, 6, 1&gt;() &lt;&lt; 0, 0, 1, 0, 0, 0).finished(),
+        (Eigen::Matrix&lt;double, 6, 1&gt;() &lt;&lt; 0, -1, 0, 0.78, 0, 0).finished(),
+        (Eigen::Matrix&lt;double, 6, 1&gt;() &lt;&lt; 0, 0, 1, 0, 0, 0).finished(),
+        (Eigen::Matrix&lt;double, 6, 1&gt;() &lt;&lt; 0, 1, 0, -1.18, 0, 0).finished(),
+        (Eigen::Matrix&lt;double, 6, 1&gt;() &lt;&lt; 0, 0, 1, 0, 0, 0).finished()
+    };
+    // iiwa14 末端初始位姿（零关节角时的T）
+    const Eigen::Matrix4d M = (Eigen::Matrix4d() &lt;&lt;
+        1, 0, 0, 0.0,
+        0, 1, 0, 0.0,
+        0, 0, 1, 1.306,
+        0, 0, 0, 1).finished();
+};
+</code></pre><p>计算逆解的函数就可以写成如下的形式：</p>
+<pre tabindex="0"><code>void iiwa14_ik_ceres(const Eigen::Matrix4d t_goal, Eigen::Matrix&lt;double, 7, 1&gt;&amp; q,
+    const Eigen::Matrix&lt;double, 7, 1&gt;&amp; q_init)
+{
+    Sophus::SE3d T_goal(t_goal);
+    Eigen::Matrix&lt;double, 7, 1&gt; q_opt = q_init;
+
+    ceres::Problem problem;
+
+    // 代价：位姿误差
+    ceres::CostFunction* cost = new ceres::AutoDiffCostFunction&lt;iiwa14_IKCostFunctor_DH, 6, 7&gt;(new iiwa14_IKCostFunctor_DH(T_goal));
+    problem.AddResidualBlock(cost, nullptr, q_opt.data());
+
+    // 关节限位
+    const std::vector&lt;std::pair&lt;double, double&gt;&gt; joint_limits = {
+    {-170, 170}, {-120, 120}, {-170, 170}, {-120, 120}, {-170, 170}, {-120, 120}, {-175, 175}};
+    for (int i = 0; i &lt; 7; ++i) {
+        problem.SetParameterLowerBound(q_opt.data(), i, joint_limits[i].first * M_PI / 180.0);
+        problem.SetParameterUpperBound(q_opt.data(), i, joint_limits[i].second * M_PI / 180.0);
+    }
+
+    ceres::Solver::Options options;
+    options.linear_solver_type = ceres::DENSE_QR;
+    options.minimizer_progress_to_stdout = false;
+    ceres::Solver::Summary sum;
+    ceres::Solve(options, &amp;problem, &amp;sum);
+
+    q = q_opt;
+}
+</code></pre><p>这样求解得到的关节角度是无数解中的其中一个，与初始的角度差别可能有点大。如果想要求解尽量接近初始角度，可以增加一个代价函数：</p>
+<pre tabindex="0"><code>/// &lt;summary&gt;
+/// iiwa14代价函数用于限制结果尽量接近初始角度
+/// &lt;/summary&gt;
+struct IKJointRegularizationCost
+{
+    IKJointRegularizationCost(Eigen::Matrix&lt;double, 7, 1&gt; qinit) : q_init(qinit) {}
+
+    template &lt;typename T&gt;
+    bool operator()(const T* q, T* res) const {
+        Eigen::Map&lt;const Eigen::Matrix&lt;T, 7, 1&gt;&gt; q_vec(q);
+        Eigen::Map&lt;Eigen::Matrix&lt;T, 7, 1&gt;&gt; res_vec(res);
+        res_vec = q_vec - q_init.cast&lt;T&gt;();
+        return true;
+    }
+private:
+    Eigen::Matrix&lt;double, 7, 1&gt; q_init;
+};
+</code></pre><p>在逆解函数中只需要将代价函数增加到problem里面：</p>
+<pre tabindex="0"><code>// 1. 主代价：位姿误差
+ceres::CostFunction* cost = new ceres::AutoDiffCostFunction&lt;iiwa14_IKCostFunctor_DH, 6, 7&gt;(new iiwa14_IKCostFunctor_DH(T_goal));
+problem.AddResidualBlock(cost, nullptr, q_opt.data());
+
+// 2. 关节角度正则化代价：让结果贴近初始值
+auto* joint_cost = new ceres::AutoDiffCostFunction&lt;IKJointRegularizationCost, 7, 7&gt;(new IKJointRegularizationCost(q_init));
+problem.AddResidualBlock(joint_cost, nullptr, q_opt.data());
+</code></pre><h2 id="23-小结">2.3 小结<a hidden class="anchor" aria-hidden="true" href="#23-小结">#</a></h2>
+<p>解析法求解速度快，而且在机械臂构型确定的情况下具有唯一解，但是在边界情况（机械臂工作空间边界、奇异位置附近）会出现错误的求解结果。而数值解法在边界情况下不会有这样的问题，但是数值解法可能会陷入局部最优，而且大部分时间求解出来的关节角度不是我们想要的关节角度。两种解法进行结合，即正常情况下使用解析解法，边界情况下使用数值解法，可以做到在机械臂工作空间内100%正确求解。</p>
 <h1 id="参考文献">参考文献<a hidden class="anchor" aria-hidden="true" href="#参考文献">#</a></h1>
 <p>[1] Position-based kinematics for 7-DoF serial manipulators with global configuration control, joint limit and singularity avoidance. Carlos Fariaa, Flora Ferreira, etc.</p>
 
