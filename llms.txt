@@ -4,6 +4,7 @@
 ## 文章
 
 ### 机械臂算法笔记
+- [6轴机械臂运动学](https://hugoooool.github.io/papers/robot-algorithm/6-axis-robot-kinematics/)
 - [7轴机械臂运动学](https://hugoooool.github.io/papers/robot-algorithm/7-axis-robot-kinematics/)
 - [机械臂手眼标定](https://hugoooool.github.io/papers/robot-algorithm/robot-handeye-calibration/)
 
