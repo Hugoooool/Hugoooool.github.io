@@ -138,7 +138,7 @@
     "机械臂"
   ],
   "articleBody": "一、UR5正运动学 1.1 DH法 DH参数在很多文章中都有介绍，本文就不再赘述了，这里只给出结果。 机械臂的关节坐标系如下： 图1.1 机械臂关节坐标系\nDH参数如下： 图1.2 机械臂DH参数\n其中参数值具体为： $$ d_{1}=0.089159, d_{4}=0.10915, d_{5}=0.09465 d_{6}=0.0823, a_{2}=0.425, a_{3}=0.39225 $$ 有了DH参数，求解正运动学就变得很简单了，相邻坐标系之间的变换关系如下： $$ ^{i-1}T_{i}=\\begin{bmatrix} \\cos\\theta_{i} \u0026 -\\sin\\theta_{i}\\cos\\alpha_{i} \u0026 \\sin\\theta_{i}\\sin\\alpha_{i} \u0026 a_{i}\\cos\\theta_{i} \\\\ \\sin\\theta_{i} \u0026 \\cos\\theta_{i}\\cos\\alpha_{i} \u0026 -\\cos\\theta_{i}\\sin\\alpha_{i} \u0026 a_{i}\\sin\\theta_{i} \\\\ 0 \u0026 \\sin\\alpha_{i} \u0026 \\cos\\alpha_{i} \u0026 d_{i} \\\\ 0 \u0026 0 \u0026 0 \u0026 1 \\end{bmatrix} $$ 正运动学解就是： $$ ^0T_{7}=^0T_{1}^1T_{2}^2T_{3}^3T_{4}^4T_{5}^5T_{6}^6T_{7} $$ 代码如下：\nHomogeneousMatrix UR5_Kinematics::computeTransform(const DHParams\u0026 dh, const double qi) { double ct = cos(dh.theta); double st = sin(dh.theta); double ca = cos(dh.alpha); double sa = sin(dh.alpha); HomogeneousMatrix T; T \u003c\u003c ct, -st * ca, st * sa, dh.a * ct, st, ct * ca, -ct * sa, dh.a* st, 0, sa, ca, dh.d, 0, 0, 0, 1; return T; } HomogeneousMatrix UR5_Kinematics::fk_dh(const JointsVector\u0026 q) { HomogeneousMatrix T_total = HomogeneousMatrix::Identity(); for (size_t i = 0; i \u003c dh_params.size(); ++i) { dh_params[i].theta = q[i]; T_total = T_total * computeTransform(dh_params[i], q[i]); } return T_total; } 1.2 旋量（PoE）法 DH法依赖局部坐标系，建立坐标系的方法不同得到的参数就不一样。用旋量法来描述机械臂就不依赖局部坐标系，它的核心思想是：在基座固定坐标系下，把每个关节的运动看成绕某条螺旋轴的旋转/平移，用矩阵指数描述单关节运动，再按顺序连乘得到末端位姿。\n首先确定零位，即当各关节角度都为0时，机械臂末端相对于基坐标的位姿矩阵，UR5机械臂的零位矩阵为： $$ T=\\begin{bmatrix} 1 \u0026 0 \u0026 0 \u0026 -(a_{2}+a_{3}) \\\\ 0 \u0026 0 \u0026 -1 \u0026 -(d_{4}+d_{6}) \\\\ 0 \u0026 1 \u0026 0 \u0026 d_{1}-d_{5} \\\\ 0 \u0026 0 \u0026 0 \u0026 1 \\end{bmatrix} $$ 然后确定每个关节对应的旋量轴如图1.1所示。\n取各轴线上一点在基坐标系下的坐标： 图1.3 轴线上一点在基坐标系下的坐标\n在基坐标系下取关节轴单位旋转方向$\\omega_{i}$（转动关节）或设$\\omega_{i}=0$（移动关节），并计算线速度部分$v_{i}=-\\omega_{i}\\times q_{i}$（转动关节）或$v_{i}=$平移方向单位向量（移动关节）。得到旋量参数如下： 图1.4 旋量参数\n从而得到空间旋量： $$\\xi_{i}=\\begin{bmatrix} \\omega_{i} \\\\ v_{i} \\end{bmatrix}$$ $T_{0}$和$\\xi_{i}$就是旋量法所需要的全部参数。\n正运动学方程为： $$T(\\theta)=e^{[\\xi_{1}]\\theta_{1}}e^{[\\xi_{2}]\\theta_{2}}\\dots e^{[\\xi_{n}]\\theta_{n}}T_{0}$$ 代码如下：\nHomogeneousMatrix UR5_Kinematics::fk_poe(const JointsVector\u0026 q) { Eigen::Matrix4d T = Eigen::Matrix4d::Identity(); for (int i = 0; i \u003c NUM_JOINTS; ++i) { Eigen::Matrix4d T_temp = Eigen::Matrix4d::Identity(); Eigen::Matrix omega = screws[i].block(0, 0, 3, 1); Eigen::Matrix vel = screws[i].block(3, 0, 3, 1); if (std::abs(q[i]) \u003c 1e-10) // 处理小角度情况 { T_temp = Eigen::Matrix4d::Identity(); } else { double sin_theta = sin(q[i]); double one_minus_cos = 1 - cos(q[i]); Eigen::Matrix3d W; W \u003c\u003c 0, -omega[2], omega[1], omega[2], 0, -omega[0], -omega[1], omega[0], 0; // 旋转部分 Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin_theta * W + one_minus_cos * W * W; // 平移部分 Eigen::Matrix3d V = Eigen::Matrix3d::Identity() * q[i] + one_minus_cos * W + (q[i] - sin_theta) * W * W; Eigen::Matrix t = V * vel; T_temp.block(0, 0, 3, 3) = R; T_temp.block(0, 3, 3, 1) = t; } T *= T_temp; } T *= M_zero; return T; } 二、UR5逆运动学 2.1 解析解法 已知机械臂末端位姿T求各关节角度。\n将T写成： $$ T=\\begin{bmatrix} n_{x} \u0026 o_{x} \u0026 a_{x} \u0026 p_{x} \\\\ n_{y} \u0026 o_{y} \u0026 a_{y} \u0026 p_{y} \\\\ n_{z} \u0026 o_{z} \u0026 a_{z} \u0026 p_{z} \\\\ 0 \u0026 0 \u0026 0 \u0026 1 \\end{bmatrix} $$ 求关节1角度： $$ \\theta_{1}=atan2(m_{1}, n_{1})-atan2(d_{4},\\pm\\sqrt{ c_{1} }) $$ 其中， $$ \\begin{aligned} m_{1}\u0026=d_{6}a_{y}-p_{y} \\\\ n_{1}\u0026=a_{x}d_{6}-p_{x} \\\\ c_{1}\u0026=m_{1}^2+n_{1}^2-d_{4}^2 \\end{aligned} $$ 如果$c_{1}\u003c0$则求解不出来。\n如果$c_{1}=0$则表示肩关节处于奇异位置。关节5/6轴线的交点处于Z1Z2平面内，如下图所示： 图2.1 肩关节奇异位置\n求关节5角度： $$ \\theta_{5}=\\pm acos(c_{2}) $$ 其中， $$ c_{2}=a_{x}\\sin(\\theta_{1})-a_{y}\\cos(\\theta_{1}) $$ 如果$c_{2}\u003e1$则求解不出来。\n求关节6角度： $$ \\theta_{6}=atan2(m_{6},n_{6})-atan2(\\sin(\\theta_{5}),0) $$ 其中， $$ \\begin{aligned} m_{6}\u0026=n_{x}\\sin(\\theta_{1})-n_{y}\\cos(\\theta_{1}) \\\\ n_{6}\u0026=o_{x}\\sin(\\theta_{1})-o_{y}\\cos(\\theta_{1}) \\end{aligned} $$ 如果$\\sin(\\theta_{5})=0$则表示腕关节处于奇异位置。此时$\\theta_{5}=0$轴线Z4和Z6平行逆运动学有无数解，如下图所示： 图2.2 腕关节奇异位置\n求关节3角度： $$ \\theta_{3}=\\pm arccos(\\frac{m_{3}^2+n_{3}^2-a_{2}^2-a_{3}^2}{2a_{2}a_{3}}) $$ 其中，\n$$ \\begin{aligned} m_{3}=\u0026d_{5}(\\sin(\\theta_{6})(n_{x}\\cos(\\theta_{1})+n_{y}\\sin(\\theta_{1}))+\\cos(\\theta_{6})(o_{x}\\cos(\\theta_{1})+o_{y}\\sin(\\theta_{1}))) \\\\ \u0026-d_{6}(a_{x}\\cos(\\theta_{1})+a_{y}\\sin(\\theta_{1}))+p_{x}\\cos(\\theta_{1})+p_{y}\\sin(\\theta_{1}) \\end{aligned} $$\n$$ n_{3}=p_{z}-d_{1}-a_{z}d_{6}+d_{5}(o_{z}\\cos(\\theta_{6})+n_{z}\\sin(\\theta_{6})) $$\n另外需要判断一个条件：\n$$ c_{3}=m_{3}^2+n_{3}^2-(a_{2}+a_{3})^2 $$\n当$c_{3}\u003e0$时求解不出来。\n当$c_{3}=0$时出现肘关节奇异位置，关节234的轴线共面： 图2.3 肘关节奇异位置\n求关节2角度： $$ \\theta_{2}=atan2(\\frac{(a_{3}\\cos(\\theta_{3})+a_{2})*n_{3}-a_{3}\\sin(\\theta_{3})m_{3}}{a_{2}^2+a_{3}^2+2a_{2}a_{3}\\cos(\\theta_{3})},\\frac{m_{3}+a_{3}\\sin(\\theta_{3})\\sin(\\theta_{2})}{a_{3}\\cos(\\theta_{3})+a_{2}}) $$ 求关节4角度： $$ \\begin{aligned} \\theta_{4}=atan2(\u0026-\\sin(\\theta_{6})(n_{x}\\cos(\\theta_{1})+n_{y}\\sin(\\theta_{1}))-\\cos(\\theta_{6})(o_{x}\\cos(\\theta_{1})+o_{y}\\sin(\\theta_{1})),\\\\ \u0026o_{z}\\cos(\\theta_{6})+n_{z}\\sin(\\theta_{6}))-\\theta_{2}-\\theta_{3} \\end{aligned} $$ 可以看出总共有8组解，求解所有8组解的代码如下：\nvoid UR5_Kinematics::ik_all(const HomogeneousMatrix pose) { for (int t = 0; t \u003c ik_num; t++) { ik_results[t].state = true; } double nx = pose(0, 0); double ny = pose(1, 0); double nz = pose(2, 0); double ox = pose(0, 1); double oy = pose(1, 1); double oz = pose(2, 1); double ax = pose(0, 2); double ay = pose(1, 2); double az = pose(2, 2); double px = pose(0, 3); double py = pose(1, 3); double pz = pose(2, 3); double D1 = dh_params[0].d; double D4 = dh_params[3].d; double D5 = dh_params[4].d; double D6 = dh_params[5].d; double A2 = dh_params[1].a; double A3 = dh_params[2].a; double m1 = D6 * ay - py; double n1 = ax * D6 - px; double condition_1 = pow(m1, 2) + pow(n1, 2) - pow(D4, 2); if (condition_1 \u003c 0) // 超出边界范围，求解不出来 { if (printErrorMsg) std::cout \u003c\u003c \"超出边界范围，求解不出来\" \u003c\u003c std::endl; for (int t = 0; t \u003c ik_num; t++) { ik_results[t].state = false; } return; } if (condition_1 \u003c tol) // condition_1 == 0 肩部奇异位置 { if (printErrorMsg) std::cout \u003c\u003c \"肩部奇异位置\" \u003c\u003c std::endl; for (int t = 0; t \u003c ik_num; t++) { ik_results[t].state = false; } return; } double theta1_1 = atan2(m1, n1) - atan2(D4, sqrt(condition_1)); double theta1_2 = atan2(m1, n1) - atan2(D4, -sqrt(condition_1)); double theta1[2] = { theta1_1, theta1_2 }; for (int i = 0; i \u003c 2; i++) { double c1 = cos(theta1[i]); double s1 = sin(theta1[i]); double condition_2 = ax * s1 - ay * c1; if (condition_2 \u003e 1) // 超出边界范围，求解不出来 { if (printErrorMsg) std::cout \u003c\u003c \"超出边界范围，求解不出来\" \u003c\u003c std::endl; for (int t = 4 * i; t \u003c= 4 * i + 3; t++) { ik_results[t].state = false; } } double theta5_1 = acos(condition_2); double theta5_2 = -acos(condition_2); double theta5[2] = { theta5_1, theta5_2 }; for (int j = 0; j \u003c 2; j++) { double s5 = sin(theta5[j]); if (abs(s5) \u003c tol) // s5 == 0 腕部奇异位置 { if (printErrorMsg) std::cout \u003c\u003c \"腕部奇异位置\" \u003c\u003c std::endl; for (int t = 4 * i + 2 * j; t \u003c= 4 * i + 2 * j + 1; t++) { ik_results[t].state = false; } } double m6 = nx * s1 - ny * c1; double n6 = ox * s1 - oy * c1; double theta6 = atan2(m6, n6) - atan2(s5, 0); double s6 = sin(theta6); double c6 = cos(theta6); double m3 = D5 * (s6 * (nx * c1 + ny * s1) + c6 * (ox * c1 + oy * s1)) - D6 * (ax * c1 + ay * s1) + px * c1 + py * s1; double n3 = pz - D1 - az * D6 + D5 * (oz * c6 + nz * s6); double condition_3 = pow(m3, 2) + pow(n3, 2) - pow(A2 + A3, 2); if (condition_3 \u003e 0) // 超出边界范围，求解不出来 { if (printErrorMsg) std::cout \u003c\u003c \"超出边界范围，求解不出来\" \u003c\u003c std::endl; for (int t = 4 * i + 2 * j; t \u003c= 4 * i + 2 * j + 1; t++) { ik_results[t].state = false; } } else if (condition_3 \u003e -tol) // condition_3 == 0 肘部奇异位置 { if (printErrorMsg) std::cout \u003c\u003c \"肘部奇异位置\" \u003c\u003c std::endl; for (int t = 4 * i + 2 * j; t \u003c= 4 * i + 2 * j + 1; t++) { ik_results[t].state = false; } } double cos_theta3 = (pow(m3, 2) + pow(n3, 2) - pow(A2, 2) - pow(A3, 2)) / (2 * A2 * A3); double theta3_1 = acos(cos_theta3); double theta3_2 = -acos(cos_theta3); double theta3[2] = { theta3_1, theta3_2 }; for (int k = 0; k \u003c 2; k++) { double s3 = sin(theta3[k]); double c3 = cos(theta3[k]); double s2 = ((A3 * c3 + A2) * n3 - A3 * s3 * m3) / (pow(A2, 2) + pow(A3, 2) + 2 * A2 * A3 * c3); double c2 = (m3 + A3 * s3 * s2) / (A3 * c3 + A2); double theta2 = atan2(s2, c2); double theta4 = atan2(-s6 * (nx * c1 + ny * s1) - c6 * (ox * c1 + oy * s1), oz * c6 + nz * s6) - theta2 - theta3[k]; ik_results[4 * i + 2 * j + k].joints[0] = theta1[i]; ik_results[4 * i + 2 * j + k].joints[1] = theta2; ik_results[4 * i + 2 * j + k].joints[2] = theta3[k]; ik_results[4 * i + 2 * j + k].joints[3] = theta4; ik_results[4 * i + 2 * j + k].joints[4] = theta5[j]; ik_results[4 * i + 2 * j + k].joints[5] = theta6; } } } } 需要通过某种策略从8组解中选择最合适的解，这里给一个与当前角度最接近的选解函数代码如下：\nJointsVector UR5_Kinematics::selectBestSolutionStrict(const std::vector q_list, const JointsVector q_last) { JointsVector best; double minCost = std::numeric_limits::max(); JointsVector q_ref; for (int i = 0; i \u003c 6; ++i) q_ref[i] = normalizeAngle(q_last[i]); for (const auto\u0026 sol : q_list) { double cost = 0.0; for (int i = 0; i \u003c 6; ++i) { double d = normalizeAngle(sol[i] - q_ref[i]); cost += JOINT_WEIGHT[i] * d * d; } if (cost \u003c minCost) { minCost = cost; best = sol; } } return best; } 综合一下上述求解和选解过程，完整的解析法逆解函数如下：\nbool UR5_Kinematics::ik_analy(const HomogeneousMatrix pose, JointsVector\u0026 q_result, const JointsVector q_last) { // 1. 计算出所有可行解 ik_all(pose); // 2. 筛选出没有报错的计算结果 std::vector q_list; for (int i = 0; i \u003c ik_results.size(); i++) { if (ik_results[i].state == true) { q_list.push_back(ik_results[i].joints); } } if (q_list.size() == 0) // 如果所有解都计算出错则返回false return false; // 3. 用选解器找到最合适的解 q_result = selectBestSolutionStrict(q_list, q_last); return true; } 2.2 数值解法 由上述求解过程可以看出，有许多条件需要判断，容易出现求解不出来或奇异位置等情况导致求解失败。如果不想出现过多的这种求解失败的情况，可以考虑数值解法。\n逆运动学的本质是给定末端位姿： $$ T_{target}\\in SE(3) $$ 求关节角： $$ q=[q_{1},q_{2},\\dots,q_{6}]^T $$ 使得： $$ T_{fk}(q)\\approx T_{target} $$ 即理想情况下$E(q)=T_{target}^{-1}T_{fk}(q)=I$是单位阵。优化目标就是让$E(q)=I$，$\\log(I)=0$，所以代价函数可以设计为： $$ J=\\parallel \\log(E(q))\\parallel^2=\\parallel \\log(T_{target}^{-1}T_{fk}(q))\\parallel^2 $$ 迭代的步骤为：\n对给定的q进行正运动学求解得到$T_{fk}(q)$； 计算代价函数J； 如果J小于某个给定精度（如$10^{-4}$），则q为优化结果。否则更新q继续上述迭代步骤。 使用Sophus+Ceres库，首先定义残差的计算方式：\n/// /// ur5逆解残差，用DH计算正解 /// struct ur5_IKCostFunctor_DH { ur5_IKCostFunctor_DH(const Sophus::SE3d\u0026 T) : T_goal(T) {} template bool operator()(const T* const q_ptr, T* residual) const { Eigen::Map",
-  "wordCount" : "2059",
+  "wordCount" : "2227",
   "inLanguage": "zh",
   "image":"https://hugoooool.github.io/papers/robot-algorithm/6-axis-robot-kinematics/images/1.png","datePublished": "2026-09-02T16:11:53+08:00",
   "dateModified": "2026-09-02T16:11:53+08:00",
@@ -234,7 +234,7 @@
     <div class="post-description">
       介绍了UR5机械臂的正逆运动学
     </div>
-    <div class="post-meta"><span title='2026-09-02 16:11:53 +0800 +0800'>2026年9月2日</span>&nbsp;·&nbsp;<span>10 分钟</span>&nbsp;·&nbsp;<span>Hugoooool</span>
+    <div class="post-meta"><span title='2026-09-02 16:11:53 +0800 +0800'>2026年9月2日</span>&nbsp;·&nbsp;<span>11 分钟</span>&nbsp;·&nbsp;<span>Hugoooool</span>
 
 </div>
   </header> 
@@ -268,7 +268,19 @@
                     <li>
                         <a href="#21-%e8%a7%a3%e6%9e%90%e8%a7%a3%e6%b3%95" aria-label="2.1 解析解法">2.1 解析解法</a></li>
                     <li>
-                        <a href="#22-%e6%95%b0%e5%80%bc%e8%a7%a3%e6%b3%95" aria-label="2.2 数值解法">2.2 数值解法</a>
+                        <a href="#22-%e6%95%b0%e5%80%bc%e8%a7%a3%e6%b3%95" aria-label="2.2 数值解法">2.2 数值解法</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e4%b8%89%e9%9b%85%e5%8f%af%e6%af%94%e7%9f%a9%e9%98%b5" aria-label="三、雅可比矩阵">三、雅可比矩阵</a><ul>
+                            
+                    <li>
+                        <a href="#31-%e9%80%9f%e5%ba%a6%e9%9b%85%e5%8f%af%e6%af%94" aria-label="3.1 速度雅可比">3.1 速度雅可比</a></li>
+                    <li>
+                        <a href="#32-%e5%8a%9b%e9%9b%85%e5%8f%af%e6%af%94" aria-label="3.2 力雅可比">3.2 力雅可比</a></li>
+                    <li>
+                        <a href="#33-%e5%a5%87%e5%bc%82%e6%80%a7" aria-label="3.3 奇异性">3.3 奇异性</a></li>
+                    <li>
+                        <a href="#34-%e9%9b%85%e5%8f%af%e6%af%94%e7%9f%a9%e9%98%b5%e7%9a%84%e8%ae%a1%e7%ae%97" aria-label="3.4 雅可比矩阵的计算">3.4 雅可比矩阵的计算</a>
                     </li>
                 </ul>
                 </li>
@@ -931,6 +943,84 @@ private:
     ceres::Solve(options, &amp;problem, &amp;sum);
 
     q = q_opt;
+}
+</code></pre><h1 id="三雅可比矩阵">三、雅可比矩阵<a hidden class="anchor" aria-hidden="true" href="#三雅可比矩阵">#</a></h1>
+<h2 id="31-速度雅可比">3.1 速度雅可比<a hidden class="anchor" aria-hidden="true" href="#31-速度雅可比">#</a></h2>
+<p>速度雅可比描述的是从关节速度到末端速度的变换。
+假设关节位置为$q\in \mathbb{R}^n$，末端在笛卡尔空间的位姿为$x$，则正运动学$x=f(q)$对时间求导得：
+$$
+\mathcal{V}=J(q)\dot{q}
+$$</p>
+<ul>
+<li>$\mathcal{V}=[v;\omega]\in\mathbb{R}^6$：末端空间速度(twist)，前3项是线速度，后3项是角速度。</li>
+<li>$J(q)\in\mathbb{R}^{6\times n}$：速度雅可比矩阵，n为关节数。
+物理意义：J的第i列就是“只让第i个关节以单位速度运动，其余关节不动”时，末端所产生的twist。整个末端速度是所有关节列向量的线性叠加。
+构造方法：设$z_{i}$为关节i转轴方向，$p_{i}$为其位置，$p_{end}$为末端位置，则：</li>
+<li>旋转关节i：$J_{i}=\begin{bmatrix} z_{i}\times(p_{end}-p_{i}) \\ z_{i} \end{bmatrix}$</li>
+<li>移动关节i：$J_{i}=\begin{bmatrix} z_{i} \\ 0 \end{bmatrix}$</li>
+</ul>
+<h2 id="32-力雅可比">3.2 力雅可比<a hidden class="anchor" aria-hidden="true" href="#32-力雅可比">#</a></h2>
+<p>力雅可比描述的是从末端力到关节力矩的变换。
+假设末端作用在系统/环境上的力旋量(wrench)为$\mathcal{F}=[f;m]\in\mathbb{R}^6$，则：
+$$
+\tau=J^T(q)\mathcal{F}
+$$</p>
+<ul>
+<li>$\tau\in\mathbb{R}^n$：各关节所需的力矩大小。
+在静力平衡状态下，末端对外做的功必须等于所有关节做的功，即：
+$$
+\mathcal{F}^T\mathcal{V}=\tau^T\dot{q}
+$$
+将速度关系$\mathcal{V}=J\dot{q}$代入：
+$$
+\mathcal{F}^TJ\dot{q}=\tau^T\dot{q} \ \  \forall \dot{q}\to\tau=J^T\mathcal{F}
+$$
+所以力雅可比就是速度雅可比矩阵的转置。</li>
+</ul>
+<h2 id="33-奇异性">3.3 奇异性<a hidden class="anchor" aria-hidden="true" href="#33-奇异性">#</a></h2>
+<p>当雅可比矩阵J接近奇异（不是满秩）时，会产生奇异性：</p>
+<ul>
+<li>速度域：存在某些末端方向$\mathcal{V}$，无论关节怎么运动都产生不了对应方向的速度（或需要无穷大的$\dot{q}$），即机械臂失去了该方向的运动能力。</li>
+<li>力域：存在某些方向的外力$\mathcal{F}$，落在了$J^T$的零空间里，使得$\tau=J^T\mathcal{F}=0$，不需要该关节输出任何力就能抵抗这个方向的负载。
+失去运动自由度的方向，就是能0力矩抗住负载力的方向。
+速度域里常用的可操作度指标$\omega=\sqrt{ \det(JJ^T) }$，也就是雅可比把关节空间单位球映射成末端空间的可操作椭球，椭球越扁，说明该方向越接近奇异。</li>
+</ul>
+<h2 id="34-雅可比矩阵的计算">3.4 雅可比矩阵的计算<a hidden class="anchor" aria-hidden="true" href="#34-雅可比矩阵的计算">#</a></h2>
+<pre tabindex="0"><code>void jacobian(const JointsVector&amp; q, JacobianMatrix&amp; J)
+{
+    assert(q.size() == NUM_JOINTS);
+    std::vector&lt;HomogeneousMatrix&gt; transforms;
+    HomogeneousMatrix T = HomogeneousMatrix::Identity();
+    transforms.push_back(T);
+    for (size_t i = 0; i &lt; NUM_JOINTS; ++i)
+    {
+        dh[i].theta = q[i];
+        T = T * computeTransform(dh[i]);
+        transforms.push_back(T);
+    }
+
+    J.resize(6, NUM_JOINTS);
+    J.setZero();
+
+    // 获取末端执行器位置
+    Eigen::Vector3d p_end = transforms.back().block&lt;3, 1&gt;(0, 3);
+
+    for (int i = 1; i &lt;= NUM_JOINTS; i++) {
+        // 获取关节i的位置和z轴方向
+        int i_1 = i - 1;
+        Eigen::Vector3d p_i_1 = transforms[i_1].block&lt;3, 1&gt;(0, 3);
+        Eigen::Vector3d z_i_1 = transforms[i_1].block&lt;3, 1&gt;(0, 2); // Z轴是第三列
+
+        // 计算线速度部分：z_i × (p_end - p_i)
+        Eigen::Vector3d linear = z_i_1.cross(p_end - p_i_1);
+
+        // 角速度部分直接是z_i
+        Eigen::Vector3d angular = z_i_1;
+
+        // 填充雅可比矩阵列
+        J.block&lt;3, 1&gt;(0, i_1) = linear;
+        J.block&lt;3, 1&gt;(3, i_1) = angular;
+    }
 }
 </code></pre>
 
